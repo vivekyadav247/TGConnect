@@ -1,0 +1,261 @@
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Verify Assignments</title>
+    <link rel="icon" href="{% static './TGConnect.jpeg' %}" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        background-color: #f5efff;
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      .header {
+        background-color: #4b0082;
+        padding: 15px 20px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .header a {
+        color: white;
+        text-decoration: none;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+      }
+
+      .header a i {
+        margin-right: 5px;
+        margin-left: 5px;
+      }
+
+      .header .title {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .container-table {
+        max-width: 95%;
+        margin: 40px auto;
+        background-color: #e5d9f2;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .search-bar {
+        max-width: 400px;
+        margin: 15px 0 25px;
+      }
+
+      .search-bar input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #ffffff;
+      }
+
+      th,
+      td {
+        padding: 12px 16px;
+        text-align: center;
+        border: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #a294f9;
+        color: white;
+      }
+
+      tr:nth-child(even) {
+        background-color: #f5efff;
+      }
+
+      tr:nth-child(odd) {
+        background-color: #e5d9f2;
+      }
+
+      .badge {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+      }
+
+      .action-link {
+        font-weight: bold;
+        text-decoration: none;
+      }
+
+      .verify-link {
+        color: green;
+      }
+
+      .unverify-link {
+        color: red;
+      }
+
+      .action-link:hover {
+        text-decoration: underline;
+      }
+
+      @media screen and (max-width: 768px) {
+        .header .title {
+          font-size: 1.2rem;
+        }
+
+        .search-bar input {
+          padding: 6px;
+        }
+      }
+
+      .wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      footer {
+        background-color: #4b0082;
+        color: #f5efff;
+        text-align: center;
+        padding: 10px 0;
+        font-size: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="header px-4">
+      <a href="/tghome/"><i class="bi bi-house-door-fill"></i> Home</a>
+      <div class="title text-center flex-grow-1">Verify Assignments</div>
+      <a href="/">Logout<i class="bi bi-box-arrow-right"></i></a>
+    </div>
+
+    <!-- Assignment Verification Table -->
+    <div class="container-table">
+      <h4 class="mb-0 text-dark fw-bold text-center">Student Assignments</h4>
+
+      <div class="search-bar mx-auto">
+        <input
+          type="text"
+          id="searchInput"
+          onkeyup="filterTable()"
+          placeholder="Search Enroll, Name, Subject, Branch"
+          class="form-control"
+        />
+      </div>
+
+      <div class="table-responsive">
+        <table
+          class="table table-bordered text-center align-middle"
+          id="verifyTable"
+        >
+          <thead class="table-primary">
+            <tr>
+              <th>Enroll No.</th>
+              <th>Name</th>
+              <th>Subject</th>
+              <th>Branch</th>
+              <th>View</th>
+              <th>Verify</th>
+              <th>Action</th>
+              <th>Info</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in data %}
+            <tr>
+              <td>{{ row.enroll }}</td>
+              <td>{{ row.name }}</td>
+              <td>{{ row.subject }}</td>
+              <td>{{ row.branch }}</td>
+              <td>
+                <a
+                  href="/media/{{ row.filename }}"
+                  target="_blank"
+                  class="btn btn-sm btn-info"
+                  >View</a
+                >
+              </td>
+              <td>
+                {% if row.verify == 1 %}
+                <span class="badge bg-success">Verified</span>
+                {% else %}
+                <span class="badge bg-danger">Unverified</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if row.verify == 0 %}
+                <a
+                  href="/verify/?v=0&enroll={{ row.enroll }}"
+                  class="action-link verify-link"
+                  >Verify</a
+                >
+                {% else %}
+                <a
+                  href="/verify/?v=1&enroll={{ row.enroll }}"
+                  class="action-link unverify-link"
+                  >Unverify</a
+                >
+                {% endif %}
+              </td>
+              <td>{{ row.info }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="text-center text-muted">
+                No assignments available.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-auto" >&copy; 2025 TGConnect. All rights reserved .</footer>
+
+    <!-- Search Script -->
+    <script>
+      function filterTable() {
+        const input = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const rows = document.querySelectorAll("#verifyTable tbody tr");
+
+        rows.forEach((row) => {
+          const cells = row.querySelectorAll("td");
+          let match = false;
+
+          for (let i = 0; i < 4; i++) {
+            if (cells[i] && cells[i].innerText.toLowerCase().includes(input)) {
+              match = true;
+              break;
+            }
+          }
+
+          row.style.display = match ? "" : "none";
+        });
+      }
+    </script>
+  </body>
+</html>

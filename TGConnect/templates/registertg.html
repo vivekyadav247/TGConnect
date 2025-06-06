@@ -1,0 +1,291 @@
+{% load static %}
+<html>
+  <head>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Register Page</title>
+    <link rel="icon" href="{% static './TGConnect.jpeg' %}"/>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f5efff;
+        background-size: cover;
+        margin: 0;
+        padding: 0;
+        animation: fadeInBody 1s ease forwards;
+      }
+
+      @keyframes fadeInBody {
+        from {opacity: 0;}
+        to {opacity: 1;}
+      }
+
+      header {
+        background-color: #cdc1ff;
+        padding: 20px;
+        text-align: center;
+        font-size: 28px;
+        color: #4b0082;
+        font-weight: bold;
+        position: relative;
+      }
+      /* Back button styling */
+      .back-btn {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #4b0082;
+        text-decoration: none;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.3s ease;
+      }
+      .back-btn:hover {
+        color: #a294f9;
+      }
+
+      .overlay {
+        background-color: rgba(245, 239, 255, 0.3);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px; /* add padding for small devices */
+      }
+
+      .register-container {
+        width: 100%;
+        max-width: 600px;
+        background-color: #e5d9f2;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transform: translateY(30px);
+        animation: slideUpFadeIn 0.8s forwards ease;
+        box-sizing: border-box;
+      }
+
+      @keyframes slideUpFadeIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .form-label {
+        color: #4b0082;
+      }
+
+      input.form-control,
+      select.form-select {
+        transition: box-shadow 0.3s ease, border-color 0.3s ease;
+      }
+
+      input.form-control:focus,
+      select.form-select:focus {
+        border-color: #4b0082;
+        box-shadow: 0 0 10px rgba(75, 0, 130, 0.5);
+        outline: none;
+      }
+
+      .btn-register {
+        background-color: #a294f9;
+        color: white;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+      }
+
+      .btn-register:hover {
+        background-color: #4b0082;
+        color: white;
+        transform: scale(1.05);
+      }
+
+      footer {
+        position: fixed;
+        width: 100%;
+        top: 94%;
+        height: 3rem;
+        align-content: center;
+        text-align: center;
+        font-size: 1rem;
+        color: #f5efff;
+        background-color: #4b0082;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+        header {
+          font-size: 22px;
+          padding: 15px;
+        }
+        .back-btn {
+          font-size: 20px;
+          left: 10px;
+        }
+        .register-container {
+          padding: 20px;
+          max-width: 100%;
+          border-radius: 10px;
+        }
+        footer {
+          font-size: 0.9rem;
+          height: 2.5rem;
+          top: 95%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        header {
+          font-size: 18px;
+          padding: 12px 10px;
+        }
+        .back-btn {
+          font-size: 18px;
+          left: 8px;
+          gap: 4px;
+        }
+        .register-container {
+          padding: 15px;
+          max-width: 100%;
+          border-radius: 8px;
+        }
+        .btn-register {
+          width: 100%;
+          padding: 10px 0;
+          font-size: 1.1rem;
+        }
+        footer {
+          font-size: 0.85rem;
+          height: 2.5rem;
+          top: 96%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="/" class="back-btn" title="Back to Welcome Page">
+        <i class="bi bi-arrow-left"></i> Back
+      </a>
+      Register on TGConnect
+    </header>
+    <br />
+    <main>
+      <div class="overlay">
+        <div class="register-container">
+          <h2 class="text-center mb-4" style="color: #4b0082">Register Here as TG</h2>
+          <form method="post" action="/registertg/">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label">ID</label>
+              <input
+                type="text"
+                name="id"
+                class="form-control"
+                placeholder="Enter your ID"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Name</label>
+              <input
+                type="text"
+                name="name"
+                class="form-control"
+                placeholder="Enter your full name"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Date of Birth</label>
+              <input type="date" name="dob" class="form-control" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Gender</label>
+              <select class="form-select" name="gender">
+                <option selected disabled>Select Gender</option>
+                <option>Male</option>
+                <option>Female</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email ID</label>
+              <input
+                type="email"
+                name="email"
+                class="form-control"
+                placeholder="Enter Email ID"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Mobile Number</label>
+              <input
+                type="number"
+                name="mobile"
+                class="form-control"
+                placeholder="Enter Mobile No."
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Course</label>
+              <select class="form-select" name="course">
+                <option selected disabled>Select Course</option>
+                <option>B.Tech</option>
+                <option>Diploma</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Department</label>
+              <select class="form-select" name="department">
+                <option selected disabled>Select Department</option>
+                <option>CSE</option>
+                <option>IT</option>
+                <option>CSE-AI</option>
+                <option>CSE-DS</option>
+                <option>Mechanical</option>
+                <option>Electrical</option>
+                <option>Civil</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Academic Year</label>
+              <select class="form-select" name="year">
+                <option selected disabled>Select Year</option>
+                <option>2022-2026</option>
+                <option>2023-2027</option>
+                <option>2024-2028</option>
+                <option>2025-2029</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Password</label>
+              <input
+                type="password"
+                class="form-control"
+                name="password"
+                placeholder="Enter password"
+              />
+            </div>
+            <div class="text-center">
+              <button type="submit" class="btn btn-register">Register</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <br /> <br /> <br /> <br />
+    </main>
+    <footer>&copy; 2025 TGConnect. All rights reserved .</footer>
+  </body>
+</html>

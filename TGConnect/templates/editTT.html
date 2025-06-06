@@ -1,0 +1,288 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Timetable</title>
+    <link rel="icon" href="{% static './TGConnect.jpeg' %}" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      body {
+        background-color: #f5efff;
+        animation: fadeIn 0.8s ease-in-out;
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      .header {
+        background-color: #4b0082;
+        padding: 20px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1rem;
+      }
+
+      .header .title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        flex-grow: 1;
+        text-align: center;
+      }
+
+      .header a {
+        color: white;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+      }
+
+      .header a i {
+        margin-right: 8px;
+      }
+
+      .form-container {
+        background-color: #e5d9f2;
+        border-radius: 12px;
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 30px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        animation: slideInUp 0.9s ease-out;
+      }
+
+      .btn-submit {
+        background-color: #a294f9;
+        color: white;
+      }
+
+      .btn-submit:hover {
+        background-color: #cdc1ff;
+      }
+
+      .table-container {
+        background-color: #e5d9f2;
+        border-radius: 12px;
+        max-width: 95%;
+        margin: 50px auto;
+        padding: 30px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        animation: slideInUp 1s ease-out;
+      }
+
+      .search-bar {
+        max-width: 400px;
+        margin: 20px auto;
+        width: 100%;
+      }
+
+      footer {
+        text-align: center;
+        font-size: 1rem;
+        padding: 15px;
+        color: white;
+        background-color: #4b0082;
+        margin-top: 50px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- 🔹 Header -->
+    <div class="header px-4">
+      <a href="/tghome/"><i class="bi bi-house-door-fill"></i> Home</a>
+      <div class="title">Edit Timetable</div>
+      <a href="/"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </div>
+
+    <!-- 🔹 Form Section -->
+    <div class="form-container">
+      <form method="post" action="/editTT/" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Select Department</label>
+          <select class="form-select" name="department" required>
+            <option disabled selected>Select Department</option>
+            <option>CSE</option>
+            <option>IT</option>
+            <option>CSE-AI</option>
+            <option>CSE-DS</option>
+            <option>Mechanical</option>
+            <option>Electrical</option>
+            <option>Civil</option>
+          </select>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Select Month</label>
+            <select class="form-select" name="month" required>
+              <option disabled selected>Select Month</option>
+              {% for m in months %}
+              <option>{{ m }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Select Week</label>
+            <select class="form-select" name="week" required>
+              <option disabled selected>Select Week</option>
+              <option>Week 1</option>
+              <option>Week 2</option>
+              <option>Week 3</option>
+              <option>Week 4</option>
+              <option>Week 5</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">From Date</label>
+            <input type="date" name="fromdate" class="form-control" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">To Date</label>
+            <input type="date" name="todate" class="form-control" required />
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Upload Timetable File</label>
+          <input class="form-control" type="file" name="file" required />
+        </div>
+
+        <button type="submit" class="btn btn-submit w-100">
+          Add Timetable
+        </button>
+      </form>
+    </div>
+
+    <!-- 🔹 Table Section -->
+    <div class="table-container">
+      <h4 class="text-center mb-3">Timetable Records</h4>
+
+      <div class="search-bar">
+        <input
+          type="text"
+          id="searchInput"
+          onkeyup="filterTable()"
+          placeholder="Search by Month or Week"
+          class="form-control"
+        />
+      </div>
+
+      <div class="table-responsive">
+        <table
+          class="table table-bordered table-striped text-center"
+          id="ttTable"
+        >
+          <thead class="table-primary">
+            <tr>
+              <th>Department</th>
+              <th>Month</th>
+              <th>Week</th>
+              <th>Date From</th>
+              <th>Date To</th>
+              <th>Download</th>
+              <th>Action</th>
+              <th>Info</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in data %}
+            <tr>
+              <td>{{ row.department }}</td>
+              <td>{{ row.month }}</td>
+              <td>{{ row.week }}</td>
+              <td>{{ row.fromdate }}</td>
+              <td>{{ row.todate }}</td>
+              <td>
+                <a
+                  href="/media/{{ row.filename }}"
+                  target="_blank"
+                  class="btn btn-sm btn-info"
+                  >View</a
+                >
+                <a
+                  href="/media/{{ row.filename }}"
+                  download
+                  class="btn btn-sm btn-secondary"
+                  >Download</a
+                >
+              </td>
+              <td>
+                <a
+                  href="/manageTT/?s=delete&week={{ row.week }}&month={{ row.month }}&department={{ row.department }}"
+                  class="btn btn-sm btn-danger"
+                  >Delete</a
+                >
+              </td>
+              <td>{{ row.info }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8">No timetable entries found.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 🔹 Footer -->
+    <footer>&copy; 2025 TGConnect. All rights reserved.</footer>
+
+    <!-- 🔹 Search Script -->
+    <script>
+      function filterTable() {
+        const input = document.getElementById("searchInput");
+        const filter = input.value.toLowerCase();
+        const rows = document
+          .getElementById("ttTable")
+          .getElementsByTagName("tr");
+
+        for (let i = 1; i < rows.length; i++) {
+          let cells = rows[i].getElementsByTagName("td");
+          let match = false;
+          for (let j = 0; j < 3; j++) {
+            if (cells[j] && cells[j].innerText.toLowerCase().includes(filter)) {
+              match = true;
+              break;
+            }
+          }
+          rows[i].style.display = match ? "" : "none";
+        }
+      }
+    </script>
+  </body>
+</html>

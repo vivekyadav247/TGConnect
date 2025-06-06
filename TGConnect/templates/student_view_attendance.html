@@ -1,0 +1,151 @@
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>View Attendance</title>
+  <link rel="icon" href="{% static './TGConnect.jpeg' %}"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    body {
+      background-color: #f5efff;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    .header {
+      background-color: #4b0082;
+      padding: 20px;
+      text-align: center;
+      color: white;
+      font-size: 2rem;
+      font-weight: bold;
+      animation: slideInUp 0.7s ease-in-out;
+    }
+
+    .form-container {
+      background-color: #e5d9f2;
+      border-radius: 12px;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      animation: slideInUp 1s ease-out;
+    }
+
+    .btn-submit {
+      background-color: #a294f9;
+      color: white;
+    }
+
+    .btn-submit:hover {
+      background-color: #cdc1ff;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 1rem;
+      padding: 15px;
+      color: white;
+      background-color: #4b0082;
+      margin-top: 50px;
+    }
+
+    .summary-box {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .summary-box p {
+      margin: 5px 0;
+      font-weight: 500;
+    }
+
+    .table-container {
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header d-flex justify-content-between align-items-center px-4">
+    <a href="/studenthome/" class="text-white text-decoration-none d-flex align-items-center fs-6">
+      <i class="bi bi-house-door-fill me-2"></i> Home
+    </a>
+    <div class="fw-bold fs-4 text-center flex-grow-1">View Attendance</div>
+    <a href="/" class="text-white text-decoration-none d-flex align-items-center fs-6">
+      Logout <i class="bi bi-box-arrow-right ms-2"></i>
+    </a>
+  </div>
+
+  <!-- Filter & Summary Section -->
+  <div class="form-container">
+    <form method="get" action="/student_view_attendance/">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-5">
+          <label for="fromDate" class="form-label">From Date</label>
+          <input type="date" id="fromDate" name="from_date" class="form-control" value="{{ from_date }}" required />
+        </div>
+        <div class="col-md-5">
+          <label for="toDate" class="form-label">To Date</label>
+          <input type="date" id="toDate" name="to_date" class="form-control" value="{{ to_date }}" required />
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-submit w-100">Filter</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Attendance Summary -->
+    {% if total_days is not none %}
+      <div class="summary-box mt-4">
+        <p><strong>Total Days:</strong> {{ total_days }}</p>
+        <p><strong>Present:</strong> {{ present }}</p>
+        <p><strong>Absent:</strong> {{ absent }}</p>
+        <p><strong>Leave:</strong> {{ leave }}</p>
+        <p><strong>Percentage:</strong> {{ percentage }}%</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Attendance Table Section -->
+  <div class="form-container table-container">
+    <h4 class="mb-3">Attendance Details</h4>
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped text-center">
+        <thead class="table-primary">
+          <tr>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record in records %}
+            <tr>
+              <td>{{ record.date }}</td>
+              <td>{{ record.status }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="2">No attendance records found for the selected date range.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>&copy; 2025 TGConnect. All rights reserved .</footer>
+</body>
+</html>

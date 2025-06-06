@@ -1,0 +1,157 @@
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registration Success</title>
+  <link rel="icon" href="{% static './TGConnect.jpeg' %}"/>
+  <style>
+    :root {
+      --primary-purple: #4b0082;
+      --secondary-lavender: #a294f9;
+      --light-green: #4BB543;
+      --background: #f5efff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      background-color: var(--background);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .success-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    .checkmark {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: #e0d9f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 25px;
+      box-shadow: 0 0 20px var(--secondary-lavender);
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    .checkmark svg {
+      width: 80px;
+      height: 80px;
+      stroke: var(--light-green);
+      stroke-width: 5;
+      fill: none;
+    }
+
+    .checkmark circle {
+      stroke: var(--light-green);
+      stroke-dasharray: 310;
+      stroke-dashoffset: 310;
+      animation: circle-draw 0.6s ease forwards;
+    }
+
+    .checkmark path {
+      stroke-dasharray: 50;
+      stroke-dashoffset: 50;
+      animation: check-draw 0.5s ease 0.6s forwards;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-top: 10px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      color: var(--primary-purple);
+    }
+
+    .redirect-link {
+      display: inline-block;
+      margin-top: 20px;
+      font-weight: 600;
+      text-decoration: none;
+      color: white;
+      background: var(--primary-purple);
+      padding: 12px 28px;
+      border-radius: 30px;
+      box-shadow: 0 4px 15px rgba(75, 72, 130, 0.6);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      font-size: 1.1rem;
+    }
+
+    .redirect-link:hover {
+      background-color: var(--secondary-lavender);
+      color: var(--primary-purple);
+      box-shadow: 0 6px 20px rgba(162, 148, 249, 0.8);
+    }
+
+    footer {
+      background-color: var(--primary-purple);
+      color: var(--background);
+      text-align: center;
+      padding: 12px 0;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 0 15px var(--secondary-lavender);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 30px var(--secondary-lavender);
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes circle-draw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes check-draw {
+      to { stroke-dashoffset: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <div class="success-container">
+      <div class="checkmark">
+        <svg viewBox="0 0 52 52">
+          <circle cx="26" cy="26" r="24" />
+          <path d="M14 27l10 10 14-20" />
+        </svg>
+      </div>
+      <h1>TG Registered Successfully !!</h1>
+      <a href="/" class="redirect-link">Go to Home and Login as TG</a>
+    </div>
+
+    <footer>&copy; 2025 TGConnect. All rights reserved .</footer>
+  </div>
+
+</body>
+</html>

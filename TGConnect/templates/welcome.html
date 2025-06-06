@@ -1,0 +1,236 @@
+{% load static %}
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Welcome to TGConnect</title>
+    <link rel="icon" style="border-radius: 25%;" href="{% static './TGConnect.jpeg' %}"/>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #e5d9f2;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: #4b0082;
+        padding-top: 70px;
+      }
+
+      .navbar {
+        background-color: #4b0082;
+      }
+
+      .navbar-brand,
+      .nav-link {
+        color: white !important;
+        font-weight: 500;
+      }
+
+      .logo-image {
+        text-align: center;
+        margin: 20px auto;
+      }
+
+      .logo-image img {
+        width: 200px;
+        height: 200px;
+        background-color: #cdc1ff;
+        border-radius: 25%;
+      }
+
+      .welcome-heading {
+        font-size: 2.8rem;
+        text-align: center;
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+
+      .subheading {
+        text-align: center;
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+        font-style: italic;
+        color: #5a189a;
+      }
+
+      .card-grid {
+        max-width: 100%;
+        margin: 0 auto 100px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        padding: 0 20px;
+      }
+
+      .tg-card {
+        background-color: white;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 25px 20px;
+        text-align: center;
+        transition: all 0.3s ease, transform 0.3s ease;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 1s ease forwards;
+      }
+
+      .tg-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+      }
+
+      .tg-card h5 {
+        font-weight: bold;
+        margin-top: 15px;
+        color: #4b0082;
+      }
+
+      .tg-card i {
+        font-size: 2rem;
+        color: #4b0082;
+      }
+
+      .tg-card a {
+        display: inline-block;
+        margin-top: 15px;
+        text-decoration: none;
+        background-color: #4b0082;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: 0.3s;
+      }
+
+      .tg-card a:hover {
+        background-color: #6c00a2;
+      }
+
+      footer {
+        background-color: #4b0082;
+        color: white;
+        text-align: center;
+        padding: 10px;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+      }
+
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Responsive Adjustments for Small Screens */
+      @media (max-width: 576px) {
+        .logo-image img {
+          width: 120px;
+          height: 120px;
+        }
+
+        .welcome-heading {
+          font-size: 1.8rem;
+        }
+
+        .subheading {
+          font-size: 1rem;
+        }
+
+        .tg-card {
+          padding: 1rem 0.75rem;
+        }
+
+        .tg-card h5 {
+          font-size: 1rem;
+          margin-top: 10px;
+        }
+
+        .tg-card i {
+          font-size: 1.5rem;
+        }
+
+        .tg-card a {
+          padding: 8px 14px;
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+    <!-- Font Awesome -->
+    <script
+      src="https://kit.fontawesome.com/a076d05399.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <!--  Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">TGConnect</a>
+        <button
+          class="navbar-toggler bg-light"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+        >
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/contact/">Contact</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Logo -->
+    <div class="logo-image">
+      <img src="{% static './TGConnect.jpeg' %}" alt="TGConnect Logo" />
+    </div>
+
+    <!-- Welcome + Subheading -->
+    <div class="welcome-heading">Welcome to TGConnect</div>
+    <div class="subheading">Bridging Education with Smart Connectivity</div>
+
+    <!-- Card Grid -->
+    <div class="card-grid">
+      <div class="tg-card" style="animation-delay: 0.1s">
+        <i class="fas fa-user-graduate"></i>
+        <h5>Register as Student</h5>
+        <a href="/register/">Register</a>
+      </div>
+      <div class="tg-card" style="animation-delay: 0.2s">
+        <i class="fas fa-sign-in-alt"></i>
+        <h5>Login as Student</h5>
+        <a href="/login/">Login</a>
+      </div>
+      <div class="tg-card" style="animation-delay: 0.3s">
+        <i class="fas fa-chalkboard-teacher"></i>
+        <h5>Register as TG</h5>
+        <a href="/registertg/">Register</a>
+      </div>
+      <div class="tg-card" style="animation-delay: 0.4s">
+        <i class="fas fa-user-tie"></i>
+        <h5>Login as TG</h5>
+        <a href="/logintg/">Login</a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>&copy; 2025 TGConnect. All rights reserved .</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

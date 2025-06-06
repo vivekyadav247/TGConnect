@@ -1,0 +1,158 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+  <title>About TGConnect</title>
+  <link rel="icon" href="{% static './TGConnect.jpeg' %}"/>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f5efff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+    }
+    header {
+      background-color: #cdc1ff;
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      color: #4b0082;
+      font-weight: bold;
+      position: relative;
+      z-index: 1000;
+    }
+    .back-btn {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #4b0082;
+      text-decoration: none;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .back-btn:hover {
+      color: #a294f9;
+    }
+    main {
+      padding: 60px 20px 100px;
+      max-width: 900px;
+      margin: auto;
+      background-color: #e5d9f2;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      margin-top: 30px;
+      animation: fadeInUp 1s ease-out;
+    }
+    h2 {
+      color: #4b0082;
+      margin-top: 30px;
+      font-weight: bold;
+      transition: 0.3s ease-in-out;
+    }
+    p, ul {
+      color: #4b0082;
+      font-size: 1.1rem;
+      line-height: 1.7;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 10px;
+    }
+    footer {
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      height: 3rem;
+      align-content: center;
+      text-align: center;
+      font-size: 1rem;
+      color: #f5efff;
+      background-color: #4b0082;
+    }
+
+    /* Scroll animation */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 850px) {
+      header{
+        font-size: 1.5rem;
+      }
+      .back-btn{
+        font-size: 1.2rem;
+      }
+      h2 {
+        font-size: 1rem;
+      }
+      p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/" class="back-btn" title="Back to Welcome Page">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+    About TGConnect
+  </header>
+
+  <main>
+    <h2>Our Mission</h2>
+    <p>
+      TGConnect is designed to streamline the student experience by providing a centralized platform
+      for academic registration, information sharing, and collaboration. Our goal is to empower
+      students through technology and digital transformation in education.
+    </p>
+
+    <h2>What We Offer</h2>
+    <p>
+      TGConnect offers seamless student registration, course selection, academic updates, and secure
+      profile management — all in one place. Built with ease-of-use and accessibility in mind, the
+      platform is tailored for today's tech-savvy students and educational institutions.
+    </p>
+
+    <h2>Our Values</h2>
+    <ul>
+      <li><strong>Accessibility:</strong> We ensure an inclusive digital environment for every student.</li>
+      <li><strong>Innovation:</strong> Continuously improving to match the evolving educational landscape.</li>
+      <li><strong>Transparency:</strong> Students stay informed and in control of their academic data.</li>
+      <li><strong>Support:</strong> Easy navigation, responsive design, and accessible help when needed.</li>
+    </ul>
+
+    <h2>Join the TGConnect Community</h2>
+    <p>
+      Whether you're a student eager to simplify your academic life or an institution looking for a
+      smarter management solution, TGConnect is here to connect and empower. Be a part of the
+      future of digital education — join TGConnect today!
+    </p>
+  </main>
+
+  <footer>TGConnect &copy; All rights are reserved by Vivek Yadav</footer>
+</body>
+</html>

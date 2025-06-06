@@ -1,0 +1,258 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Student Home</title>
+    <link rel="icon" href="{% static './TGConnect.jpeg' %}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <style>
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f5efff;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        animation: fadeIn 0.8s ease-in-out;
+      }
+
+      header {
+        background-color: #4b0082;
+        padding: 20px;
+        text-align: center;
+        font-size: 28px;
+        color: white;
+        font-weight: bold;
+        animation: fadeIn 1s ease-in-out;
+      }
+
+      nav {
+        background-color: #a294f9;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        animation: fadeIn 1.2s ease-in-out;
+      }
+
+      nav .left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: white;
+        font-weight: 500;
+      }
+
+      nav .right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      nav .right button {
+        background-color: #e5d9f2;
+        border: none;
+        padding: 5px 15px;
+        border-radius: 10px;
+        font-weight: bold;
+        color: #4b0082;
+        transition: background-color 0.3s ease;
+      }
+
+      nav .right button:hover {
+        background-color: #d6c3ff;
+      }
+
+      main {
+        flex-grow: 1;
+        padding: 40px;
+        background-color: #e5d9f2;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 40px;
+        justify-items: center;
+        animation: fadeIn 1.4s ease-in-out;
+      }
+
+      .card-option {
+        background-color: white;
+        border: none;
+        border-radius: 20px;
+        width: 180px;
+        height: 180px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-weight: bold;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        transition: 0.3s ease;
+        cursor: pointer;
+        padding: 20px;
+        opacity: 0;
+        animation: slideUp 0.6s ease forwards;
+      }
+
+      /* Stagger each card */
+      .card-option:nth-child(1) {
+        animation-delay: 0.2s;
+      }
+      .card-option:nth-child(2) {
+        animation-delay: 0.3s;
+      }
+      .card-option:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      .card-option:nth-child(4) {
+        animation-delay: 0.5s;
+      }
+      .card-option:nth-child(5) {
+        animation-delay: 0.6s;
+      }
+      .card-option:nth-child(6) {
+        animation-delay: 0.7s;
+      }
+
+      .card-option:hover {
+        background-color: #cdc1ff;
+        transform: translateY(-5px);
+      }
+
+      .card-option i {
+        font-size: 36px;
+        margin-bottom: 10px;
+        color: #a294f9;
+      }
+
+      a.card-option {
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      @media (max-width: 850px) {
+        main {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 20px 10px;
+          gap: 20px;
+        }
+
+        .card-option {
+          width: 90% !important; /* Full width on mobile */
+          height: 75px !important; /* Rectangle height */
+          flex-direction: row; /* Icon left, text right */
+          justify-content: flex-start;
+          padding: 15px 25px;
+          font-size: 1.1rem;
+        }
+
+        .card-option i {
+          font-size: 28px !important;
+          margin-bottom: 0 !important;
+          margin-right: 20px;
+          color: #a294f9;
+        }
+      }
+
+      footer {
+        position: relative;
+        width: 100%;
+        margin-top : 3rem ;
+        height: 3rem;
+        align-content: center;
+        text-align: center;
+        font-size: 1rem;
+        color: #f5efff;
+        background-color: #4b0082;
+        animation: fadeIn 1.6s ease-in-out;
+      }
+    </style>
+  </head>
+  <body>
+    <header>Student Home</header>
+
+    <nav>
+      <div class="left">
+        <i class="bi bi-person-circle fs-4"></i>
+        <span>{{sname}}</span>
+        <a href="/editprofile/" style="text-decoration: none; color: white"
+          ><i class="bi bi-pencil-fill"></i
+        ></a>
+      </div>
+      <div class="right">
+        <i class="bi bi-box-arrow-right fs-5"></i>
+        <button type="submit">
+          <a href="/logout/" style="text-decoration: none; color: #4b0082"
+            >Logout</a
+          >
+        </button>
+      </div>
+    </nav>
+
+    <main>
+      <a href="/student_view_attendance/" class="card-option">
+        <i class="bi bi-clipboard-check"></i>
+        View Attendance
+      </a>
+      <a href="/viewreports/" class="card-option">
+        <i class="bi bi-journal-text"></i>
+        View Reports
+      </a>
+      <a href="/viewnotes/" class="card-option">
+        <i class="bi bi-book"></i>
+        View Notes
+      </a>
+      <a href="/viewTT/" class="card-option">
+        <i class="bi bi-calendar-week"></i>
+        View Time Table
+      </a>
+      <a href="/uploadassign/" class="card-option">
+        <i class="bi bi-upload"></i>
+        Upload Assignment
+      </a>
+      <a href="/student_notifications/" class="card-option">
+        <i class="bi bi-bell"></i>
+        Notifications
+      </a>
+    </main>
+
+    <footer>&copy; 2025 TGConnect. All rights reserved .</footer>
+  </body>
+</html>

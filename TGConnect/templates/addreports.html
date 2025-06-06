@@ -1,0 +1,287 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Reports</title>
+    <link rel="icon" href="{% static './TGConnect.jpeg' %}" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      body {
+        background-color: #f5efff;
+        animation: fadeIn 0.8s ease-in-out;
+      }
+
+      .header {
+        background-color: #4b0082;
+        padding: 20px;
+        text-align: center;
+        color: white;
+        font-size: 2rem;
+        font-weight: bold;
+        animation: slideInUp 0.7s ease-in-out;
+      }
+
+      .form-container {
+        background-color: #e5d9f2;
+        border-radius: 12px;
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 30px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        animation: slideInUp 1s ease-out;
+      }
+
+      .btn-submit {
+        background-color: #a294f9;
+        color: white;
+      }
+
+      .btn-submit:hover {
+        background-color: #cdc1ff;
+      }
+
+      footer {
+        text-align: center;
+        font-size: 1rem;
+        padding: 15px;
+        color: white;
+        background-color: #4b0082;
+        margin-top: 50px;
+      }
+
+      .search-bar {
+        max-width: 400px;
+        margin: 20px auto;
+        text-align: center;
+        animation: slideInUp 1s ease;
+      }
+
+      .search-bar input {
+        padding: 10px;
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 🔹 Header -->
+    <div class="header d-flex justify-content-between align-items-center px-4">
+      <a
+        href="/tghome/"
+        class="text-white text-decoration-none d-flex align-items-center fs-6"
+      >
+        <i class="bi bi-house-door-fill me-2"></i> Home
+      </a>
+      <div class="fw-bold fs-4 text-center flex-grow-1">Add Reports</div>
+      <a
+        href="/"
+        class="text-white text-decoration-none d-flex align-items-center fs-6"
+      >
+        Logout <i class="bi bi-box-arrow-right ms-2"></i>
+      </a>
+    </div>
+
+    <!-- 🔹 Form Section -->
+    <div class="form-container">
+      {% if output %}
+      <div class="alert alert-success text-center">{{ output }}</div>
+      {% endif %}
+      <form method="post" action="/addreports/" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <label for="studentName" class="form-label">Student Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="studentName"
+            name="name"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="enrollmentNumber" class="form-label"
+            >Enrollment Number</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            id="enrollmentNumber"
+            name="enroll"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Branch</label>
+          <select class="form-select" name="branch" required>
+            <option selected disabled>Select Branch</option>
+            <option>CSE</option>
+            <option>IT</option>
+            <option>CSE-AI</option>
+            <option>CSE-DS</option>
+            <option>Mechanical</option>
+            <option>Electrical</option>
+            <option>Civil</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="sgpa" class="form-label">SGPA</label>
+          <input
+            type="text"
+            class="form-control"
+            id="sgpa"
+            name="cgpa"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="semester" class="form-label">Semester</label>
+          <select class="form-select" id="semester" name="sem" required>
+            <option selected disabled>Choose Semester</option>
+            {% for i in "12345678" %}
+            <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label for="marksheet" class="form-label">Upload Marksheet</label>
+          <input
+            class="form-control"
+            type="file"
+            id="marksheet"
+            name="file"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn btn-submit w-100">Add Report</button>
+      </form>
+    </div>
+
+    <!-- 🔹 Table Section -->
+    <div class="form-container mt-5">
+      <div
+        class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-3"
+      >
+        <h4 class="mb-0">All Uploaded Reports</h4>
+        <input
+          type="text"
+          id="searchInput"
+          onkeyup="filterTable()"
+          placeholder="Search by Name or Enrollment..."
+          class="form-control"
+          style="max-width: 300px;"
+        />
+      </div>
+
+      <div class="table-responsive">
+        <table
+          class="table table-bordered table-striped text-center"
+          id="reportsTable"
+        >
+          <thead class="table-primary">
+            <tr>
+              <th>Enrollment No.</th>
+              <th>Name</th>
+              <th>Semester</th>
+              <th>SGPA</th>
+              <th>View</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in data %}
+            <tr>
+              <td>{{ row.enroll }}</td>
+              <td>{{ row.name }}</td>
+              <td>{{ row.sem }}</td>
+              <td>{{ row.cgpa }}</td>
+              <td>
+                <a
+                  href="/media/{{ row.filename }}"
+                  target="_blank"
+                  class="btn btn-sm btn-info"
+                  >View</a
+                >
+              </td>
+              <td>
+                <a
+                  href="/managereports/?s=delete&enroll={{ row.enroll }}"
+                  class="btn btn-sm btn-danger"
+                  >Delete</a
+                >
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6">No reports available.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer>&copy; 2025 TGConnect. All rights reserved.</footer>
+
+    <script>
+      function filterTable() {
+        const input = document.getElementById("searchInput");
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById("reportsTable");
+        const rows = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < rows.length; i++) {
+          let cells = rows[i].getElementsByTagName("td");
+          let match = false;
+          for (let j = 0; j < 2; j++) {
+            if (
+              cells[j] &&
+              cells[j].innerText.toLowerCase().includes(filter)
+            ) {
+              match = true;
+              break;
+            }
+          }
+          rows[i].style.display = match ? "" : "none";
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,295 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>View Reports</title>
+    <link rel="icon" href="{% static './TGConnect.jpeg' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: #f5efff;
+        font-family: "Segoe UI", sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+        max-width: 100vw;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        background-color: #4b0082;
+        color: white;
+        padding: 15px 20px;
+        height: 60px;
+        box-shadow: 0 2px 8px rgba(75, 0, 130, 0.5);
+        flex-shrink: 0;
+        max-width: 100vw;
+      }
+
+      header a {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+
+      header .title {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        font-weight: 700;
+        font-size: 22px;
+        pointer-events: none;
+        user-select: none;
+        white-space: nowrap;
+        max-width: 60vw;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      main#page {
+        flex-grow: 1;
+        width: 100%;
+        max-width: 1200px;
+        margin: 40px auto 100px;
+        padding: 0 20px;
+        overflow-x: hidden;
+      }
+
+      .search-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        max-width: 400px;
+        margin-bottom: 20px;
+      }
+
+      .search-container input {
+        flex-grow: 1;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        min-width: 180px;
+        font-size: 16px;
+      }
+
+      .search-container button {
+        background-color: #4b0082;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        min-width: 80px;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+      }
+
+      .search-container button:hover {
+        background-color: #a294f9;
+        color: #4b0082;
+      }
+
+      .table-container {
+        overflow-x: auto;
+        box-shadow: 0 4px 8px rgba(75, 0, 130, 0.15);
+        border-radius: 12px;
+        background-color: #e5d9f2;
+        padding: 10px;
+        width: 100%;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+        background-color: #cdc1ff;
+        border-radius: 10px;
+        table-layout: auto;
+      }
+
+      th,
+      td {
+        padding: 12px 16px;
+        text-align: left;
+        vertical-align: middle;
+        white-space: nowrap;
+        font-size: 15px;
+      }
+
+      th {
+        background-color: #a294f9;
+        color: white;
+        font-weight: 700;
+      }
+
+      tbody tr:nth-child(even) {
+        background-color: #f5efff;
+      }
+
+      tbody tr:nth-child(odd) {
+        background-color: #e5d9f2;
+      }
+
+      a {
+        text-decoration: none;
+        color: #4b0082;
+        font-weight: bold;
+      }
+
+      a:hover {
+        color: #2e0555;
+        text-decoration: underline;
+      }
+
+      footer {
+        background-color: #4b0082;
+        color: #f5efff;
+        text-align: center;
+        padding: 15px 20px;
+        font-size: 14px;
+        box-shadow: 0 -2px 8px rgba(75, 0, 130, 0.5);
+        flex-shrink: 0;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+        left: 0;
+      }
+
+      @media (max-width: 768px) {
+        main#page {
+          margin: 20px 10px 100px;
+          padding: 0 10px;
+        }
+
+        .search-container {
+          max-width: 100%;
+        }
+
+        .search-container input,
+        .search-container button {
+          width: 100%;
+          min-width: unset;
+        }
+
+        table {
+          table-layout: fixed;
+        }
+
+        th,
+        td {
+          white-space: normal;
+          padding: 8px 10px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        header a {
+          font-size: 14px;
+        }
+
+        header .title {
+          font-size: 18px;
+          max-width: 50vw;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="/studenthome/"><i class="bi bi-house-door-fill"></i> Home</a>
+      <div class="title">View Reports</div>
+      <a href="/"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </header>
+
+    <main id="page">
+      <h2>View and Download Reports</h2>
+      <div class="search-container">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by Enroll, Name, Sem or SGPA"
+        />
+        <button onclick="filterReports()">Search</button>
+      </div>
+
+      <div class="table-container">
+        <table id="reportTable">
+          <thead>
+            <tr>
+              <th>Enroll No.</th>
+              <th>Name</th>
+              <th>Sem</th>
+              <th>SGPA</th>
+              <th>Marksheet</th>
+              <th>Info</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in data %}
+            <tr>
+              <td>{{row.enroll}}</td>
+              <td>{{row.name}}</td>
+              <td>{{row.sem}}</td>
+              <td>{{row.cgpa}}</td>
+              <td>
+                <a href="/media/{{row.filename}}" target="_blank">View</a> /
+                <a href="/media/{{row.filename}}" download>Download</a>
+              </td>
+              <td>{{row.info}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <footer>&copy; 2025 TGConnect. All rights reserved.</footer>
+
+    <script>
+      function filterReports() {
+        const input = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const rows = document.querySelectorAll("#reportTable tbody tr");
+
+        rows.forEach((row) => {
+          const cells = row.querySelectorAll("td");
+          let match = false;
+          for (let i = 0; i < 4; i++) {
+            if (cells[i] && cells[i].innerText.toLowerCase().includes(input)) {
+              match = true;
+              break;
+            }
+          }
+          row.style.display = match ? "" : "none";
+        });
+      }
+    </script>
+  </body>
+</html>

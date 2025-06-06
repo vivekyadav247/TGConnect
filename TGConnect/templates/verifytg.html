@@ -1,0 +1,104 @@
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verify TG Email</title>
+  <link rel="icon" href="{% static './TGConnect.jpeg' %}"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f5efff;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .header {
+      background-color: #4b0082;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header .title {
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .header a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .header a i {
+      margin-right: 6px;
+    }
+
+    .verify-container {
+      max-width: 500px;
+      margin: 60px auto;
+      background-color: #e5d9f2;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-primary {
+      background-color: #a294f9;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #8e7ae6;
+    }
+
+    .error-text {
+      color: red;
+      font-size: 0.95rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background-color: #4b0082;
+      color: white;
+      margin-top: 60px;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <a href="/registertg/"><i class="bi bi-arrow-left-circle-fill"></i> Back</a>
+    <div class="title">TG Email Verification</div>
+    <div></div>
+  </div>
+
+  <!--  Verification Box -->
+  <div class="verify-container">
+    <h4 class="text-center mb-4">Enter OTP</h4>
+    
+    {% if error %}
+      <div class="alert alert-danger text-center">{{ error }}</div>
+    {% endif %}
+    
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">OTP sent to <strong>{{ email }}</strong></label>
+        <input type="text" class="form-control" name="otp" required />
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Verify</button>
+    </form>
+  </div>
+
+  <!-- Footer -->
+    <footer>&copy; 2025 TGConnect. All rights reserved .</footer>
+</body>
+</html>

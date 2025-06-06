@@ -1,0 +1,168 @@
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Student Notifications</title>
+  <link rel="icon" href="{% static './TGConnect.jpeg' %}"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    body {
+      background-color: #f5efff;
+      font-family: "Segoe UI", sans-serif;
+      animation: fadeIn 0.8s ease-in-out;
+      padding-bottom: 80px;
+    }
+
+    .header {
+      background-color: #4b0082;
+      padding: 20px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1rem;
+    }
+
+    .header .title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .header a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .header a i {
+      margin-right: 8px;
+    }
+
+    .notification-card {
+      background-color: #e5d9f2;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin: 20px auto;
+      padding: 20px 25px;
+      max-width: 700px;
+      animation: slideInUp 0.9s ease-out;
+    }
+
+    .notification-title {
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #4b0082;
+      margin-bottom: 12px;
+    }
+
+    .btn-group {
+      margin-bottom: 12px;
+    }
+
+    .btn-view {
+      background-color: #a294f9;
+      color: white;
+      margin-right: 10px;
+    }
+
+    .btn-view:hover {
+      background-color: #cdc1ff;
+      color: #4b0082;
+    }
+
+    .btn-download {
+      background-color: #4b0082;
+      color: white;
+    }
+
+    .btn-download:hover {
+      background-color: #a294f9;
+      color: #4b0082;
+    }
+
+    .info-line {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .expiry-active {
+      color: green;
+      font-weight: 600;
+    }
+
+    .expiry-expired {
+      color: red;
+      font-weight: 600;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 1rem;
+      padding: 15px;
+      color: white;
+      background-color: #4b0082;
+      margin-top: 50px;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header px-4">
+    <a href="/studenthome/"><i class="bi bi-house-door-fill"></i> Home</a>
+    <div class="title">Notifications</div>
+    <a href="/logout/"><i class="bi bi-box-arrow-right"></i> Logout</a>
+  </div>
+
+  {% if notifications %}
+    {% for note in notifications %}
+      <div class="notification-card">
+        <div class="notification-title">{{ note.title }}</div>
+        <div class="btn-group">
+          <a href="/media/{{ note.notice_file }}" target="_blank" class="btn btn-sm btn-view">
+            <i class="bi bi-eye"></i> View
+          </a>
+          <a href="/media/{{ note.notice_file }}" download class="btn btn-sm btn-download">
+            <i class="bi bi-download"></i> Download
+          </a>
+        </div>
+        <div class="info-line"><strong>Info:</strong> {{ note.info }}</div>
+        <div class="info-line">
+          <strong>Expiry Date:</strong> {{ note.expiry_date }} &mdash;
+          {% if note.expiry_date < today %}
+            <span class="expiry-expired">Expired</span>
+          {% else %}
+            <span class="expiry-active">Active</span>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="notification-card text-center" style="font-style: italic; color: #777;">
+      No notifications available for your department.
+    </div>
+  {% endif %}
+
+  <footer>&copy; 2025 TGConnect. All rights reserved .</footer>
+
+</body>
+</html>

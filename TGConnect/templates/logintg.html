@@ -1,0 +1,161 @@
+{% load static %}
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+    <meta charset="UTF-8" />
+    <title>Login Page</title>
+    <link rel="icon" href="{% static './TGConnect.jpeg' %}"/>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-size: cover;
+        background-color: #f5efff;
+        margin: 0;
+        padding: 0;
+        animation: fadeInBody 1s ease-in;
+      }
+      @keyframes fadeInBody {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      header {
+        background-color: #cdc1ff;
+        padding: 20px;
+        text-align: center;
+        font-size: 28px;
+        color: #4b0082;
+        font-weight: bold;
+        position: relative;
+      }
+      .back-btn {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #4b0082;
+        text-decoration: none;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.3s ease;
+      }
+      .back-btn:hover {
+        color: #a294f9;
+      }
+      .overlay {
+        background-color: rgba(229, 217, 242, 0.35);
+        min-height: 90vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .login-container {
+        width: 100%;
+        max-width: 400px;
+        background-color: #cdc1ff;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transform: translateY(40px);
+        animation: slideUpFadeIn 1s forwards ease;
+      }
+      @keyframes slideUpFadeIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .form-label {
+        color: #4b0082;
+      }
+      input.form-control {
+        transition: all 0.3s ease;
+      }
+      input.form-control:focus {
+        border-color: #4b0082;
+        box-shadow: 0 0 8px rgba(75, 0, 130, 0.5);
+      }
+      .btn-login {
+        margin-top: 1rem;
+        background-color: #4b0082;
+        color: white;
+        transition: all 0.3s ease;
+      }
+      .btn-login:hover {
+        background-color: #e5d9f2;
+        color: #4b0082;
+        transform: scale(1.05);
+      }
+      footer {
+        position: fixed;
+        width: 100%;
+        top: 94%;
+        height: 3rem;
+        align-content: center;
+        text-align: center;
+        font-size: 1rem;
+        color: #f5efff;
+        background-color: #4b0082;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="/" class="back-btn" title="Back to Welcome Page">
+        <i class="bi bi-arrow-left"></i> Back
+      </a>
+      Login on TGConnect
+    </header>
+    <main>
+      <div class="overlay">
+        <div class="login-container">
+          <h2 class="text-center mb-4" style="color: #4b0082">Login Here</h2>
+          <form method="post" action="/logintg/">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label">ID</label>
+              <input
+                type="text"
+                class="form-control"
+                name="id"
+                placeholder="Enter your ID"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Password</label>
+              <input
+                type="password"
+                name="password"
+                class="form-control"
+                placeholder="Enter password"
+              />
+            </div>
+            <div class="text-center">
+              <button type="submit" class="btn btn-login">Login</button>
+            </div>
+          </form>
+          <div class="text-center mt-3">
+            <a href="/forgotpasswordtg/" style="color: #4b0082; font-weight: 500"
+              >Forgot Password?</a
+            >
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>&copy; 2025 TGConnect. All rights reserved .</footer>
+  </body>
+</html>
