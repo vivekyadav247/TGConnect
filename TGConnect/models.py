@@ -41,7 +41,7 @@ class addreports(models.Model) :
     info = models.CharField(max_length=50)
 
 class TimeTable(models.Model):
-    id = models.AutoField(primary_key=True)  # Explicit primary key
+    # Django will automatically add BigAutoField as id, keeping consistent with migration 0007
     department = models.CharField(max_length=20)
     month = models.CharField(max_length=10)
     week = models.CharField(max_length=10)
