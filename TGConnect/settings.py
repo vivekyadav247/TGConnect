@@ -122,7 +122,8 @@ USE_TZ = True
 
 # settings.py
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+# Comment out STATICFILES_DIRS for production to avoid missing directory warning
+# STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # WhiteNoise configuration for serving static files
