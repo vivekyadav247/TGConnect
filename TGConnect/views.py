@@ -390,7 +390,14 @@ def verifytg(request):
                 "error": "An error occurred during verification. Please try again."
             })
     else:
-        return redirect("/registertg/")
+        # GET request - show verification page with email from session
+        temp_data = request.session.get("temp_tg_data")
+        if temp_data:
+            return render(request, "verifytg.html", {"email": temp_data.get("email", "")})
+        else:
+            return render(request, "registertg.html", {
+                "error": "Session expired. Please register again."
+            })
 
 def logintg(request):
     """
