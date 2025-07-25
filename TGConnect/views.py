@@ -16,84 +16,107 @@ def register(request):
     if request.method == "GET":
         return render(request, "register.html", {"output": ""})
     else:
-        enroll = request.POST.get("enroll")
-        name = request.POST.get("name")
-        dob = request.POST.get("dob")
-        gender = request.POST.get("gender")
-        email = request.POST.get("email")
-        mobile = request.POST.get("mobile")
-        address = request.POST.get("address")
-        course = request.POST.get("course")
-        branch = request.POST.get("branch")
-        year = request.POST.get("year")
-        password = request.POST.get("password")
+        try:
+            enroll = request.POST.get("enroll")
+            name = request.POST.get("name")
+            dob = request.POST.get("dob")
+            gender = request.POST.get("gender")
+            email = request.POST.get("email")
+            mobile = request.POST.get("mobile")
+            address = request.POST.get("address")
+            course = request.POST.get("course")
+            branch = request.POST.get("branch")
+            year = request.POST.get("year")
+            password = request.POST.get("password")
 
-        # Save in session temporarily
-        request.session["temp_register"] = {
-            "enroll": enroll,
-            "name": name,
-            "dob": dob,
-            "gender": gender,
-            "email": email,
-            "mobile": mobile,
-            "address": address,
-            "course": course,
-            "branch": branch,
-            "year": year,
-            "password": password,
-        }
+            # Check if all fields are provided
+            if not all([enroll, name, dob, gender, email, mobile, address, course, branch, year, password]):
+                return render(request, "register.html", {"output": "All fields are required!"})
 
-        # Send OTP
-        otp = random.randint(100000, 999999)
-        request.session["otp"] = str(otp)
+            # Check if enrollment already exists
+            if models.Register.objects.filter(enroll=enroll).exists():
+                return render(request, "register.html", {"output": "Enrollment number already exists!"})
 
-        send_mail(
-            "Email Verification - TGConnect",
-            f"Dear {name},\n\nYour OTP for email verification is: {otp}\n\nThanks,\nTGConnect",
-            "noreply@tgconnect.com",
-            [email],
-            fail_silently=False,
-        )
+            # Check if email already exists
+            if models.Register.objects.filter(email=email).exists():
+                return render(request, "register.html", {"output": "Email already registered!"})
 
-        return redirect("/verifyotp/")
+            # Save in session temporarily
+            request.session["temp_register"] = {
+                "enroll": enroll,
+                "name": name,
+                "dob": dob,
+                "gender": gender,
+                "email": email,
+                "mobile": mobile,
+                "address": address,
+                "course": course,
+                "branch": branch,
+                "year": year,
+                "password": password,
+            }
+
+            # Send OTP
+            otp = random.randint(100000, 999999)
+            request.session["otp"] = str(otp)
+
+            send_mail(
+                "Email Verification - TGConnect",
+                f"Dear {name},\n\nYour OTP for email verification is: {otp}\n\nPlease verify your email to complete registration.\n\nThanks,\nTGConnect Team",
+                "vivekyad240706@gmail.com",
+                [email],
+                fail_silently=False,
+            )
+
+            return redirect("/verifyotp/")
+        except Exception as e:
+            print(f"Error in register: {e}")
+            return render(request, "register.html", {"output": "Registration failed. Please try again."})
 
 def verifyotp(request):
     if request.method == "GET":
         return render(request, "verifyotp.html", {"msg": ""})
     else:
-        entered_otp = request.POST.get("otp")
-        real_otp = request.session.get("otp")
+        try:
+            entered_otp = request.POST.get("otp")
+            real_otp = request.session.get("otp")
+            
+            if not entered_otp:
+                return render(request, "verifyotp.html", {"msg": "Please enter OTP."})
 
-        if entered_otp == real_otp:
-            data = request.session.get("temp_register")
-            if data:
-                p = models.Register(
-                    enroll=data["enroll"],
-                    name=data["name"],
-                    dob=data["dob"],
-                    gender=data["gender"],
-                    email=data["email"],
-                    mobile=data["mobile"],
-                    address=data["address"],
-                    course=data["course"],
-                    branch=data["branch"],
-                    year=data["year"],
-                    password=data["password"],
-                    status=1,  # status verified
-                    role="student",
-                    info=time.asctime()
-                )
-                p.save()
+            if entered_otp == real_otp:
+                data = request.session.get("temp_register")
+                if data:
+                    p = models.Register(
+                        enroll=data["enroll"],
+                        name=data["name"],
+                        dob=data["dob"],
+                        gender=data["gender"],
+                        email=data["email"],
+                        mobile=data["mobile"],
+                        address=data["address"],
+                        course=data["course"],
+                        branch=data["branch"],
+                        year=data["year"],
+                        password=data["password"],
+                        status=1,  # status verified
+                        role="student",
+                        info=time.asctime()
+                    )
+                    p.save()
 
-                # Clear session
-                del request.session["temp_register"]
-                del request.session["otp"]
+                    # Clear session
+                    del request.session["temp_register"]
+                    del request.session["otp"]
 
-                return redirect("/studentsuccess/")
+                    return redirect("/studentsuccess/")
+                else:
+                    return render(request, "verifyotp.html", {"msg": "Session expired. Please register again."})
             else:
-                return render(request, "verifyotp.html", {"msg": "Session expired. Please register again."})
-        else:
-            return render(request, "verifyotp.html", {"msg": "Invalid OTP. Try again."})
+                return render(request, "verifyotp.html", {"msg": "Invalid OTP. Please try again."})
+        except Exception as e:
+            print(f"Error in verifyotp: {e}")
+            return render(request, "verifyotp.html", {"msg": "Verification failed. Please try again."})
 
 def studentsuccess(request):
     return render(request,"studentsuccess.html")
@@ -104,81 +127,112 @@ def tgsuccess(request):
 def failed(request):
     return render(request,"failed.html")
 
-def login(request) :
-    if request.method=="GET" :
-        return render(request,"login.html")
-    else :
-        enroll = request.POST.get("enroll")
-        password = request.POST.get("password")
+def login(request):
+    if request.method == "GET":
+        return render(request, "login.html")
+    else:
+        try:
+            enroll = request.POST.get("enroll")
+            password = request.POST.get("password")
+            
+            if not enroll or not password:
+                return render(request, "login.html", {"error": "Please enter both enrollment and password."})
 
-        studentdet = models.Register.objects.filter(enroll=enroll,password=password,status=1)
+            studentdet = models.Register.objects.filter(enroll=enroll, password=password, status=1)
 
-        if len(studentdet)>0 :
-            request.session['sname'] = studentdet[0].name
-            request.session['senroll'] = studentdet[0].enroll
-            request.session['sbranch'] = studentdet[0].branch
-            request.session['semail'] = studentdet[0].email
-            return redirect("/studenthome/")
-        else :
+            if len(studentdet) > 0:
+                request.session['sname'] = studentdet[0].name
+                request.session['senroll'] = studentdet[0].enroll
+                request.session['sbranch'] = studentdet[0].branch
+                request.session['semail'] = studentdet[0].email
+                return redirect("/studenthome/")
+            else:
+                return redirect("/failed/")
+        except Exception as e:
+            print(f"Error in login: {e}")
             return redirect("/failed/")
         
 def forgotpassword(request):
     if request.method == "POST":
-        action = request.POST.get("action")
+        try:
+            action = request.POST.get("action")
 
-        if action == "reset":
-            otp = request.POST.get("otp")
-            new_password = request.POST.get("new_password")
-            session_otp = request.session.get("reset_otp")
-            email = request.session.get("reset_email")
+            if action == "reset":
+                otp = request.POST.get("otp")
+                new_password = request.POST.get("new_password")
+                session_otp = request.session.get("reset_otp")
+                email = request.session.get("reset_email")
 
-            if otp == session_otp and email:
-                user = models.Register.objects.get(email=email)
-                user.password = new_password
-                user.save()
+                if not otp or not new_password:
+                    return render(request, "forgotpassword.html", {
+                        "msg": "Please enter both OTP and new password.",
+                        "show_otp": True,
+                        "email": email,
+                        "button_action": "reset",
+                        "button_text": "Reset Password"
+                    })
 
-                del request.session['reset_otp']
-                del request.session['reset_email']
+                if otp == session_otp and email:
+                    user = models.Register.objects.get(email=email)
+                    user.password = new_password
+                    user.save()
 
-                return render(request, "forgotpassword.html", {
-                    "success": "Password reset successfully!",
-                    "button_action": "",
-                    "button_text": ""
-                })
+                    del request.session['reset_otp']
+                    del request.session['reset_email']
+
+                    return render(request, "forgotpassword.html", {
+                        "success": "Password reset successfully!",
+                        "button_action": "",
+                        "button_text": ""
+                    })
+                else:
+                    return redirect('/failedotp/')
+
             else:
-                return redirect('/failedotp/')
+                email = request.POST.get("email", "").strip().lower()
+                if not email:
+                    return render(request, "forgotpassword.html", {
+                        "msg": "Please enter your email address.",
+                        "button_action": "send_otp",
+                        "button_text": "Send OTP"
+                    })
 
-        else:
-            email = request.POST.get("email", "").strip().lower()
-            user = models.Register.objects.filter(email=email).first()
+                user = models.Register.objects.filter(email=email).first()
 
-            if user:
-                otp = str(random.randint(100000, 999999))
-                request.session['reset_email'] = email
-                request.session['reset_otp'] = otp
+                if user:
+                    otp = str(random.randint(100000, 999999))
+                    request.session['reset_email'] = email
+                    request.session['reset_otp'] = otp
 
-                send_mail(
-                    "TGConnect Password Reset OTP",
-                    f"Your OTP for password reset is: {otp}",
-                    "your_email@gmail.com",
-                    [email],
-                    fail_silently=False,
-                )
+                    send_mail(
+                        "TGConnect Password Reset OTP",
+                        f"Dear {user.name},\n\nYour OTP for password reset is: {otp}\n\nIf you didn't request this, please ignore this email.\n\nThanks,\nTGConnect Team",
+                        "vivekyad240706@gmail.com",
+                        [email],
+                        fail_silently=False,
+                    )
 
-                return render(request, "forgotpassword.html", {
-                    "msg": "OTP sent to your email.",
-                    "show_otp": True,
-                    "email": email,
-                    "button_action": "reset",
-                    "button_text": "Reset Password"
-                })
-            else:
-                return render(request, "forgotpassword.html", {
-                    "msg": "Email not registered.",
-                    "button_action": "send_otp",
-                    "button_text": "Send OTP",
-                    "email": email
-                })
+                    return render(request, "forgotpassword.html", {
+                        "msg": "OTP sent to your email.",
+                        "show_otp": True,
+                        "email": email,
+                        "button_action": "reset",
+                        "button_text": "Reset Password"
+                    })
+                else:
+                    return render(request, "forgotpassword.html", {
+                        "msg": "Email not registered.",
+                        "button_action": "send_otp",
+                        "button_text": "Send OTP",
+                        "email": email
+                    })
+        except Exception as e:
+            print(f"Error in forgotpassword: {e}")
+            return render(request, "forgotpassword.html", {
+                "msg": "An error occurred. Please try again.",
+                "button_action": "send_otp",
+                "button_text": "Send OTP"
+            })
 
     else:
         return render(request, "forgotpassword.html", {
@@ -195,70 +249,142 @@ def registertg(request):
         return render(request, "registertg.html")
 
     else:
-        id = request.POST.get("id")
-        name = request.POST.get("name")
-        dob = request.POST.get("dob")
-        gender = request.POST.get("gender")
-        email = request.POST.get("email")
-        mobile = request.POST.get("mobile")
-        course = request.POST.get("course")
-        department = request.POST.get("department")
-        year = request.POST.get("year")
-        password = request.POST.get("password")
+        try:
+            id = request.POST.get("id", "").strip()
+            name = request.POST.get("name", "").strip()
+            dob = request.POST.get("dob", "").strip()
+            gender = request.POST.get("gender", "").strip()
+            email = request.POST.get("email", "").strip().lower()
+            mobile = request.POST.get("mobile", "").strip()
+            course = request.POST.get("course", "").strip()
+            department = request.POST.get("department", "").strip()
+            year = request.POST.get("year", "").strip()
+            password = request.POST.get("password", "").strip()
 
-        otp = random.randint(100000, 999999)
-        request.session["temp_tg_data"] = {
-            "id": id,
-            "name": name,
-            "dob": dob,
-            "gender": gender,
-            "email": email,
-            "mobile": mobile,
-            "course": course,
-            "department": department,
-            "year": year,
-            "password": password,
-            "otp": otp
-        }
+            # Validate required fields
+            if not all([id, name, dob, gender, email, mobile, course, department, year, password]):
+                return render(request, "registertg.html", {
+                    "error": "All fields are required.",
+                    "id": id, "name": name, "dob": dob, "gender": gender,
+                    "email": email, "mobile": mobile, "course": course,
+                    "department": department, "year": year
+                })
 
-        # Send Email
-        send_mail(
-            "Verify Your Email for TG Registration",
-            f"Your OTP is: {otp}",
-            "vivekyad240706@gmail.com",  # Replace with your sender email
-            [email],
-            fail_silently=False
-        )
+            # Check for duplicate registrations
+            existing_id = models.RegisterTG.objects.filter(id=id).first()
+            if existing_id:
+                return render(request, "registertg.html", {
+                    "error": "ID already registered.",
+                    "name": name, "dob": dob, "gender": gender,
+                    "email": email, "mobile": mobile, "course": course,
+                    "department": department, "year": year
+                })
 
-        return render(request, "verifytg.html", {"email": email})
+            existing_email = models.RegisterTG.objects.filter(email=email).first()
+            if existing_email:
+                return render(request, "registertg.html", {
+                    "error": "Email already registered.",
+                    "id": id, "name": name, "dob": dob, "gender": gender,
+                    "mobile": mobile, "course": course,
+                    "department": department, "year": year
+                })
+
+            existing_mobile = models.RegisterTG.objects.filter(mobile=mobile).first()
+            if existing_mobile:
+                return render(request, "registertg.html", {
+                    "error": "Mobile number already registered.",
+                    "id": id, "name": name, "dob": dob, "gender": gender,
+                    "email": email, "course": course,
+                    "department": department, "year": year
+                })
+
+            otp = random.randint(100000, 999999)
+            request.session["temp_tg_data"] = {
+                "id": id,
+                "name": name,
+                "dob": dob,
+                "gender": gender,
+                "email": email,
+                "mobile": mobile,
+                "course": course,
+                "department": department,
+                "year": year,
+                "password": password,
+                "otp": otp
+            }
+
+            # Send Email
+            send_mail(
+                "Verify Your Email for TG Registration",
+                f"Dear {name},\n\nWelcome to TGConnect! Your OTP for teacher registration is: {otp}\n\nPlease use this OTP to verify your account.\n\nThanks,\nTGConnect Team",
+                "vivekyad240706@gmail.com",
+                [email],
+                fail_silently=False
+            )
+
+            return render(request, "verifytg.html", {"email": email})
+        except Exception as e:
+            print(f"Error in registertg: {e}")
+            return render(request, "registertg.html", {
+                "error": "An error occurred during registration. Please try again.",
+                "id": id if 'id' in locals() else "",
+                "name": name if 'name' in locals() else "",
+                "dob": dob if 'dob' in locals() else "",
+                "gender": gender if 'gender' in locals() else "",
+                "email": email if 'email' in locals() else "",
+                "mobile": mobile if 'mobile' in locals() else "",
+                "course": course if 'course' in locals() else "",
+                "department": department if 'department' in locals() else "",
+                "year": year if 'year' in locals() else ""
+            })
 
 def verifytg(request):
     if request.method == "POST":
-        entered_otp = request.POST.get("otp")
-        temp_data = request.session.get("temp_tg_data")
+        try:
+            entered_otp = request.POST.get("otp", "").strip()
+            temp_data = request.session.get("temp_tg_data")
 
-        if temp_data and str(temp_data["otp"]) == entered_otp:
-            # Save to DB
-            p = models.RegisterTG(
-                id=temp_data["id"],
-                name=temp_data["name"],
-                dob=temp_data["dob"],
-                gender=temp_data["gender"],
-                email=temp_data["email"],
-                mobile=temp_data["mobile"],
-                course=temp_data["course"],
-                department=temp_data["department"],
-                year=temp_data["year"],
-                password=temp_data["password"],
-                status=1,
-                role="tg",
-                info=time.asctime()
-            )
-            p.save()
-            del request.session["temp_tg_data"]
-            return redirect("/tgsuccess/")
-        else:
-            return render(request, "verifytg.html", {"email": temp_data["email"], "error": "Invalid OTP!"})
+            if not entered_otp:
+                return render(request, "verifytg.html", {
+                    "email": temp_data.get("email", "") if temp_data else "",
+                    "error": "Please enter the OTP."
+                })
+
+            if not temp_data:
+                return render(request, "registertg.html", {
+                    "error": "Session expired. Please register again."
+                })
+
+            if str(temp_data["otp"]) == entered_otp:
+                # Save to DB
+                p = models.RegisterTG(
+                    id=temp_data["id"],
+                    name=temp_data["name"],
+                    dob=temp_data["dob"],
+                    gender=temp_data["gender"],
+                    email=temp_data["email"],
+                    mobile=temp_data["mobile"],
+                    course=temp_data["course"],
+                    department=temp_data["department"],
+                    year=temp_data["year"],
+                    password=temp_data["password"],
+                    status=1,
+                    role="tg",
+                    info=time.asctime()
+                )
+                p.save()
+                del request.session["temp_tg_data"]
+                return redirect("/tgsuccess/")
+            else:
+                return render(request, "verifytg.html", {
+                    "email": temp_data["email"],
+                    "error": "Invalid OTP!"
+                })
+        except Exception as e:
+            print(f"Error in verifytg: {e}")
+            return render(request, "verifytg.html", {
+                "error": "An error occurred during verification. Please try again."
+            })
     else:
         return redirect("/registertg/")
 
@@ -281,36 +407,85 @@ def logintg(request) :
 
 def forgotpasswordtg(request):
     if request.method == "POST":
-        email = request.POST.get("email").strip().lower()
-        tg = models.RegisterTG.objects.filter(email=email).first()
+        try:
+            action = request.POST.get("action")
 
-        if tg:
-            otp = str(random.randint(100000, 999999))
-            request.session['tg_reset_email'] = email
-            request.session['tg_reset_otp'] = otp
+            if action == "reset":
+                otp = request.POST.get("otp", "").strip()
+                new_password = request.POST.get("new_password", "").strip()
+                session_otp = request.session.get("tg_reset_otp")
+                email = request.session.get("tg_reset_email")
 
-            send_mail(
-                "TGConnect - TG Password Reset",
-                f"Your OTP for password reset is: {otp}",
-                "your_email@gmail.com",
-                [email],
-                fail_silently=False,
-            )
+                if not otp or not new_password:
+                    return render(request, "forgotpasswordtg.html", {
+                        "msg": "Please enter both OTP and new password.",
+                        "show_otp": True,
+                        "email": email,
+                        "button_action": "reset",
+                        "button_text": "Reset Password"
+                    })
 
+                if otp == session_otp and email:
+                    tg = models.RegisterTG.objects.get(email=email)
+                    tg.password = new_password
+                    tg.save()
+
+                    del request.session['tg_reset_otp']
+                    del request.session['tg_reset_email']
+
+                    return render(request, "forgotpasswordtg.html", {
+                        "success": "Password reset successfully!",
+                        "button_action": "",
+                        "button_text": ""
+                    })
+                else:
+                    return redirect('/invalidotp/')
+
+            else:
+                email = request.POST.get("email", "").strip().lower()
+                if not email:
+                    return render(request, "forgotpasswordtg.html", {
+                        "msg": "Please enter your email address.",
+                        "button_action": "send_otp",
+                        "button_text": "Send OTP"
+                    })
+
+                tg = models.RegisterTG.objects.filter(email=email).first()
+
+                if tg:
+                    otp = str(random.randint(100000, 999999))
+                    request.session['tg_reset_email'] = email
+                    request.session['tg_reset_otp'] = otp
+
+                    send_mail(
+                        "TGConnect - TG Password Reset",
+                        f"Dear {tg.name},\n\nYour OTP for password reset is: {otp}\n\nIf you didn't request this, please ignore this email.\n\nThanks,\nTGConnect Team",
+                        "vivekyad240706@gmail.com",
+                        [email],
+                        fail_silently=False,
+                    )
+
+                    return render(request, "forgotpasswordtg.html", {
+                        "msg": "OTP sent to your email.",
+                        "show_otp": True,
+                        "email": email,
+                        "button_action": "reset",
+                        "button_text": "Reset Password"
+                    })
+                else:
+                    return render(request, "forgotpasswordtg.html", {
+                        "msg": "Email not registered.",
+                        "email": email,
+                        "button_action": "send_otp",
+                        "button_text": "Send OTP"
+                    })
+        except Exception as e:
+            print(f"Error in forgotpasswordtg: {e}")
             return render(request, "forgotpasswordtg.html", {
-                "msg": "",
-                "show_otp": True,
-                "email": email,
-                "button_action": "reset",
-                "button_text": "Reset Password"
+                "msg": "An error occurred. Please try again.",
+                "button_action": "send_otp",
+                "button_text": "Send OTP"
             })
-
-        return render(request, "forgotpasswordtg.html", {
-            "msg": "Email not registered",
-            "email": email,
-            "button_action": "send_otp",
-            "button_text": "Send OTP"
-        })
 
     elif request.method == "GET":
         return render(request, "forgotpasswordtg.html", {
@@ -318,29 +493,6 @@ def forgotpasswordtg(request):
             "button_action": "send_otp",
             "button_text": "Send OTP"
         })
-
-    # Handle OTP + Password reset
-    elif request.POST.get("action") == "reset":
-        otp = request.POST.get("otp")
-        new_password = request.POST.get("new_password")
-        session_otp = request.session.get("tg_reset_otp")
-        email = request.session.get("tg_reset_email")
-
-        if otp == session_otp:
-            tg = models.RegisterTG.objects.get(email=email)
-            tg.password = new_password
-            tg.save()
-
-            del request.session['tg_reset_otp']
-            del request.session['tg_reset_email']
-
-            return render(request, "forgotpasswordtg.html", {
-                "success": "Password reset successfully!",
-                "button_action": "",
-                "button_text": ""
-            })
-        else:
-            return redirect('/invalidotp/')
 
 def invalidotp(request):
     return render(request,"invalidotp.html")
@@ -1105,44 +1257,79 @@ def student_notifications(request):
         return render(request, "error.html", {"message": "Error loading notifications."})
 
 def editprofile(request):
-    email = request.session.get("semail")
-    if not email:
-        return redirect("/login/") 
+    try:
+        email = request.session.get("semail")
+        if not email:
+            return redirect("/login/") 
 
-    user = models.Register.objects.filter(email=email).first()
-    if not user:
-        return redirect("/login/")
+        user = models.Register.objects.filter(email=email).first()
+        if not user:
+            return redirect("/login/")
 
-    if request.method == "POST":
-        user.name = request.POST.get("name")
-        user.dob = request.POST.get("dob")
-        user.gender = request.POST.get("gender")
-        user.mobile = request.POST.get("mobile")
-        user.address = request.POST.get("address")
-        user.course = request.POST.get("course")
-        user.branch = request.POST.get("branch")
-        user.year = request.POST.get("year")
+        if request.method == "POST":
+            # Validate required fields
+            name = request.POST.get("name", "").strip()
+            dob = request.POST.get("dob", "").strip()
+            gender = request.POST.get("gender", "").strip()
+            mobile = request.POST.get("mobile", "").strip()
+            address = request.POST.get("address", "").strip()
+            course = request.POST.get("course", "").strip()
+            branch = request.POST.get("branch", "").strip()
+            year = request.POST.get("year", "").strip()
 
-        # Optional password change
-        new_password = request.POST.get("password")
-        if new_password:
-            user.password = new_password
+            if not all([name, dob, gender, mobile, course, branch, year]):
+                return render(request, "editprofile.html", {
+                    "user": user,
+                    "error": "All fields except address and password are required.",
+                    "branches": ["CSE", "IT", "CSE-AI", "CSE-DS", "Mechanical", "Electrical", "Civil"],
+                    "years": ["2022-2026", "2023-2027", "2024-2028", "2025-2029"],
+                    "courses": ["B.Tech", "Diploma"]
+                })
 
-        user.save()
+            # Check if mobile is being changed and is not already taken
+            if mobile != user.mobile:
+                existing_mobile = models.Register.objects.filter(mobile=mobile).exclude(email=email).first()
+                if existing_mobile:
+                    return render(request, "editprofile.html", {
+                        "user": user,
+                        "error": "Mobile number already registered by another user.",
+                        "branches": ["CSE", "IT", "CSE-AI", "CSE-DS", "Mechanical", "Electrical", "Civil"],
+                        "years": ["2022-2026", "2023-2027", "2024-2028", "2025-2029"],
+                        "courses": ["B.Tech", "Diploma"]
+                    })
+
+            user.name = name
+            user.dob = dob
+            user.gender = gender
+            user.mobile = mobile
+            user.address = address
+            user.course = course
+            user.branch = branch
+            user.year = year
+
+            # Optional password change
+            new_password = request.POST.get("password", "").strip()
+            if new_password:
+                user.password = new_password
+
+            user.save()
+            return render(request, "editprofile.html", {
+                "user": user,
+                "success": "Profile updated successfully.",
+                "branches": ["CSE", "IT", "CSE-AI", "CSE-DS", "Mechanical", "Electrical", "Civil"],
+                "years": ["2022-2026", "2023-2027", "2024-2028", "2025-2029"],
+                "courses": ["B.Tech", "Diploma"]
+            })
+
         return render(request, "editprofile.html", {
             "user": user,
-            "success": "Profile updated successfully.",
             "branches": ["CSE", "IT", "CSE-AI", "CSE-DS", "Mechanical", "Electrical", "Civil"],
             "years": ["2022-2026", "2023-2027", "2024-2028", "2025-2029"],
             "courses": ["B.Tech", "Diploma"]
         })
-
-    return render(request, "editprofile.html", {
-        "user": user,
-        "branches": ["CSE", "IT", "CSE-AI", "CSE-DS", "Mechanical", "Electrical", "Civil"],
-        "years": ["2022-2026", "2023-2027", "2024-2028", "2025-2029"],
-        "courses": ["B.Tech", "Diploma"]
-    })
+    except Exception as e:
+        print(f"Error in editprofile: {e}")
+        return render(request, "error.html", {"message": "Error updating profile. Please try again."})
 
 def logout_student(request):
     request.session.flush()
