@@ -1,7 +1,6 @@
-# Secret and DB files
 .env
 db.sqlite3
 __pycache__/
 *.pyc
-/static/
 /media/
+/TGConnect/static/
