@@ -3,5 +3,8 @@ db.sqlite3
 __pycache__/
 *.pyc
 /media/
-/TGConnect/static/
+
+/TGConnect/static/*
+!/TGConnect/static/TGConnect.jpeg
+
 staticfiles/
