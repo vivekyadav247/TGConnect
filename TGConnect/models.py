@@ -1,10 +1,10 @@
 from django.db import models
 
 class Register(models.Model) :
-    enroll=models.CharField(primary_key=True,unique=True)
+    enroll=models.CharField(primary_key=True,unique=True,max_length=20)
     name=models.CharField(max_length=50)
     dob=models.DateField()
-    gender = models.CharField()
+    gender = models.CharField(max_length=10)
     email=models.EmailField(unique=True)
     mobile=models.IntegerField(unique=True)
     address = models.CharField(max_length=100)
@@ -17,7 +17,7 @@ class Register(models.Model) :
     info = models.CharField(max_length=50)
 
 class RegisterTG(models.Model) :
-    id=models.CharField(primary_key=True,unique=True)
+    id=models.CharField(primary_key=True,unique=True,max_length=20)
     name=models.CharField(max_length=50)
     dob=models.DateField()
     gender = models.CharField(max_length=10)
@@ -32,7 +32,7 @@ class RegisterTG(models.Model) :
     info = models.CharField(max_length=50)
 
 class addreports(models.Model) :
-    enroll=models.CharField(primary_key=True,unique=True)
+    enroll=models.CharField(primary_key=True,unique=True,max_length=20)
     name=models.CharField(max_length=50)
     branch = models.CharField(max_length=20)
     sem = models.IntegerField()
@@ -57,7 +57,7 @@ class Notes(models.Model) :
     info = models.CharField(max_length=50)
 
 class UploadAssignment(models.Model) :
-    enroll=models.CharField(primary_key=True,unique=True)
+    enroll=models.CharField(primary_key=True,unique=True,max_length=20)
     name=models.CharField(max_length=50)
     branch = models.CharField(max_length=20)
     subject = models.CharField(max_length=25)
