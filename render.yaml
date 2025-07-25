@@ -2,7 +2,7 @@ services:
   - type: web
     name: tgconnect
     env: python
-    buildCommand: "chmod +x deploy_script.sh && ./deploy_script.sh"
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --run-syncdb"
     startCommand: "gunicorn TGConnect.wsgi:application"
     envVars:
       - key: DJANGO_SETTINGS_MODULE
