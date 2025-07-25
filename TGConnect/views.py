@@ -225,7 +225,7 @@ def registertg(request):
         send_mail(
             "Verify Your Email for TG Registration",
             f"Your OTP is: {otp}",
-            "your-email@example.com",  # Replace with your sender email
+            "vivekyad240706@gmail.com",  # Replace with your sender email
             [email],
             fail_silently=False
         )
@@ -351,214 +351,473 @@ def about(request) :
 def contact(request) :
     return render(request,"contact.html")
 
-def studenthome(request) :
-    return render(request,"studenthome.html",{"sname": request.session["sname"],"senroll": request.session["senroll"]})
+def studenthome(request):
+    try:
+        sname = request.session.get("sname")
+        senroll = request.session.get("senroll")
+        
+        if not sname or not senroll:
+            return redirect("/login/")
+            
+        return render(request, "studenthome.html", {
+            "sname": sname,
+            "senroll": senroll
+        })
+    except Exception as e:
+        print(f"Error in studenthome: {e}")
+        return redirect("/login/")
 
-def tghome(request) :
-    return render(request,"tghome.html",{"tname": request.session["tname"],"tid": request.session["tid"]})
+def tghome(request):
+    try:
+        tname = request.session.get("tname")
+        tid = request.session.get("tid")
+        
+        if not tname or not tid:
+            return redirect("/logintg/")
+            
+        return render(request, "tghome.html", {
+            "tname": tname,
+            "tid": tid
+        })
+    except Exception as e:
+        print(f"Error in tghome: {e}")
+        return redirect("/logintg/")
 
-def managestudent(request) : 
-    studentdet = models.Register.objects.filter(role="student",branch="CSE").order_by('name')
-    return render(request,"managestudent.html",{"studentdet": studentdet})
+def managestudent(request):
+    try:
+        tdepartment = request.session.get("tdepartment")
+        tname = request.session.get("tname")
+        
+        if not tdepartment or not tname:
+            return redirect("/logintg/")
+        
+        # Use dynamic department instead of hardcoded "CSE"
+        studentdet = models.Register.objects.filter(role="student", branch=tdepartment, status=1).order_by('name')
+        
+        return render(request, "managestudent.html", {
+            "studentdet": studentdet,
+            "tname": tname
+        })
+    except Exception as e:
+        print(f"Error in managestudent: {e}")
+        return render(request, "error.html", {"message": "Error loading student data."})
 
 def managestudentstatus(request):
-    s = request.GET.get("s")
-    enroll = request.GET.get("enroll")
+    try:
+        # Check if TG is logged in
+        if not request.session.get("tname"):
+            return redirect("/logintg/")
+            
+        s = request.GET.get("s")
+        enroll = request.GET.get("enroll")
+        
+        if not s or not enroll:
+            return redirect("/managestudent/")
 
-    if s=="active" : 
-        models.Register.objects.filter(enroll=enroll).update(status=1)
-    elif s=="inactive" : 
-        models.Register.objects.filter(enroll=enroll).update(status=0)
-    else :
-        models.Register.objects.filter(enroll=enroll).delete()
+        if s == "active":
+            models.Register.objects.filter(enroll=enroll).update(status=1)
+        elif s == "inactive":
+            models.Register.objects.filter(enroll=enroll).update(status=0)
+        elif s == "delete":
+            models.Register.objects.filter(enroll=enroll).delete()
 
-    return redirect("/managestudent/")
+        return redirect("/managestudent/")
+    except Exception as e:
+        print(f"Error in managestudentstatus: {e}")
+        return redirect("/managestudent/")
 
 def addreports(request):
-    department = request.session["tdepartment"]
-    data = models.addreports.objects.filter(branch=department)  # Use branch or department as per your model
+    try:
+        department = request.session.get("tdepartment")
+        tname = request.session.get("tname")
+        
+        if not department or not tname:
+            return redirect("/logintg/")
+            
+        data = models.addreports.objects.filter(branch=department)
 
-    if request.method == "GET":
-        return render(request, "addreports.html", {
-            "tname": request.session["tname"],
-            "output": "",
+        if request.method == "GET":
+            return render(request, "addreports.html", {
+                "tname": tname,
+                "output": "",
+                "data": data
+            })
+        else:
+            enroll = request.POST.get("enroll")
+            name = request.POST.get("name")
+            branch = request.POST.get("branch")
+            sem = request.POST.get("sem")
+            cgpa = request.POST.get("cgpa")
+            
+            if not all([enroll, name, branch, sem, cgpa]):
+                return render(request, "addreports.html", {
+                    "tname": tname,
+                    "output": "All fields are required!",
+                    "data": data
+                })
+
+            if "file" not in request.FILES:
+                return render(request, "addreports.html", {
+                    "tname": tname,
+                    "output": "Please select a file!",
+                    "data": data
+                })
+
+            file = request.FILES["file"]
+            fs = FileSystemStorage()
+            filename = fs.save(file.name, file)
+
+            p = models.addreports(
+                enroll=enroll, 
+                name=name, 
+                branch=branch, 
+                cgpa=cgpa, 
+                sem=sem, 
+                filename=filename, 
+                info=time.asctime()
+            )
+            p.save()
+
+            data = models.addreports.objects.filter(branch=branch)
+            return render(request, "addreports.html", {
+                "tname": tname,
+                "output": "Report uploaded successfully!",
+                "data": data
+            })
+    except Exception as e:
+        print(f"Error in addreports: {e}")
+        return render(request, "error.html", {"message": "Error uploading report. Please try again."})
+
+def viewreports(request):
+    try:
+        enroll = request.session.get("senroll")
+        sname = request.session.get("sname")
+        
+        if not enroll or not sname:
+            return redirect("/login/")
+            
+        data = models.addreports.objects.filter(enroll=enroll)
+        return render(request, "viewreports.html", {
+            "sname": sname,
             "data": data
         })
-    else:
-        enroll = request.POST.get("enroll")
-        name = request.POST.get("name")
-        branch = request.POST.get("branch")
-        sem = request.POST.get("sem")
-        cgpa = request.POST.get("cgpa")
-
-        file = request.FILES["file"]
-        fs = FileSystemStorage()
-        filename = fs.save(file.name, file)
-
-        p = models.addreports(enroll=enroll, name=name, branch=branch, cgpa=cgpa, sem=sem, filename=filename, info=time.asctime())
-        p.save()
-
-        data = models.addreports.objects.filter(branch=branch)
-        return render(request, "addreports.html", {
-            "tname": request.session["tname"],
-            "output": "Content Upload Successfully !!",
-            "data": data
-        })
-
-def viewreports(request) :
-    enroll = request.session["senroll"]
-    data = models.addreports.objects.filter(enroll=enroll)
-    return render(request,"viewreports.html",{"sname": request.session["sname"],"data": data})
+    except Exception as e:
+        print(f"Error in viewreports: {e}")
+        return render(request, "error.html", {"message": "Error loading reports."})
 
 def managereports(request):
-    s = request.GET.get("s")
-    enroll = request.GET.get("enroll")
-    if s=="delete" :
-        models.addreports.objects.filter(enroll=enroll).delete()
+    try:
+        if not request.session.get("tname"):
+            return redirect("/logintg/")
+            
+        s = request.GET.get("s")
+        enroll = request.GET.get("enroll")
+        
+        if s == "delete" and enroll:
+            models.addreports.objects.filter(enroll=enroll).delete()
 
-    return redirect("/addreports/")
+        return redirect("/addreports/")
+    except Exception as e:
+        print(f"Error in managereports: {e}")
+        return redirect("/addreports/")
 
 def editTT(request):
-    months = "January February March April May June July August September October November December".split()
+    try:
+        department = request.session.get("tdepartment")
+        tname = request.session.get("tname")
+        
+        if not department or not tname:
+            return redirect("/logintg/")
+            
+        months = "January February March April May June July August September October November December".split()
 
-    if request.method == "GET":
-        department = request.session["tdepartment"]
-        data = models.TimeTable.objects.filter(department=department)
-        return render(
-            request,
-            "editTT.html",
-            {
-                "tname": request.session["tname"],
+        if request.method == "GET":
+            data = models.TimeTable.objects.filter(department=department)
+            return render(request, "editTT.html", {
+                "tname": tname,
                 "data": data,
-                "months": months,  # <-- add this
-            }
-        )
-    else:
-        month = request.POST.get("month")
-        week = request.POST.get("week")
-        fromdate = request.POST.get("fromdate")
-        todate = request.POST.get("todate")
-        department = request.POST.get("department")
+                "months": months,
+            })
+        else:
+            month = request.POST.get("month")
+            week = request.POST.get("week")
+            fromdate = request.POST.get("fromdate")
+            todate = request.POST.get("todate")
+            department_post = request.POST.get("department")
+            
+            if not all([month, week, fromdate, todate, department_post]):
+                data = models.TimeTable.objects.filter(department=department)
+                return render(request, "editTT.html", {
+                    "tname": tname,
+                    "data": data,
+                    "months": months,
+                    "error": "All fields are required!"
+                })
 
-        file = request.FILES['file']
-        fs = FileSystemStorage()
-        filename = fs.save(file.name, file)
+            if "file" not in request.FILES:
+                data = models.TimeTable.objects.filter(department=department)
+                return render(request, "editTT.html", {
+                    "tname": tname,
+                    "data": data,
+                    "months": months,
+                    "error": "Please select a file!"
+                })
 
-        p = models.TimeTable(
-            department=department,
-            month=month,
-            week=week,
-            fromdate=fromdate,
-            todate=todate,
-            filename=filename,
-            info=time.asctime()
-        )
-        p.save()
+            file = request.FILES['file']
+            fs = FileSystemStorage()
+            filename = fs.save(file.name, file)
 
-        department = request.session["tdepartment"]
-        data = models.TimeTable.objects.filter(department=department)
-        return render(
-            request,
-            "editTT.html",
-            {
-                "tname": request.session["tname"],
+            p = models.TimeTable(
+                department=department_post,
+                month=month,
+                week=week,
+                fromdate=fromdate,
+                todate=todate,
+                filename=filename,
+                info=time.asctime()
+            )
+            p.save()
+
+            data = models.TimeTable.objects.filter(department=department)
+            return render(request, "editTT.html", {
+                "tname": tname,
                 "data": data,
-                "months": months,  # <-- add this here too
-            }
-        )
+                "months": months,
+                "success": "Timetable uploaded successfully!"
+            })
+    except Exception as e:
+        print(f"Error in editTT: {e}")
+        return render(request, "error.html", {"message": "Error managing timetable."})
 
 def manageTT(request):
-    s = request.GET.get("s")
-    week = request.GET.get("week")
-    month = request.GET.get("month")
-    department = request.GET.get("department")
-    
-    if s=="delete" :
-        models.TimeTable.objects.get(week=week,month=month,department=department).delete()
-
-    return redirect("/editTT/")
+    try:
+        if not request.session.get("tname"):
+            return redirect("/logintg/")
+            
+        s = request.GET.get("s")
+        week = request.GET.get("week")
+        month = request.GET.get("month")
+        department = request.GET.get("department")
         
-def viewTT(request) :
-    department = request.session["sbranch"]
-    data = models.TimeTable.objects.filter(department=department)
-    return render(request,"viewTT.html",{"sname": request.session["sname"],"data": data})
+        if s == "delete" and all([week, month, department]):
+            models.TimeTable.objects.filter(
+                week=week, 
+                month=month, 
+                department=department
+            ).delete()
 
-def addnotes(request) :
-    if request.method=="GET":
-        department = request.session["tdepartment"]
-        data = models.Notes.objects.filter(department=department)
-        return render(request,"addnotes.html",{"tname": request.session["tname"],"data": data})
-    else : 
-        department = request.POST.get("department")
-        subject = request.POST.get("subject")
-        title = request.POST.get("title")
-
-        file = request.FILES['file']
-        fs = FileSystemStorage()
-        filename = fs.save(file.name,file)
-
-
-        p = models.Notes(department=department,subject=subject,title=title,filename=filename,info = time.asctime())
-        p.save() 
-        department = request.session["tdepartment"]
-        data = models.Notes.objects.filter(department=department)
-        return render(request,"addnotes.html",{"tname": request.session["tname"],"data": data})
-    
-def managenotes(request):
-    s = request.GET.get("s")
-    subject = request.GET.get("subject")
-    title = request.GET.get("title")
-    department = request.GET.get("department")
-    
-    if s=="delete" :
-        models.Notes.objects.get(subject=subject,title=title,department=department).delete()
-
-    return redirect("/addnotes/")
-
-def viewnotes(request):
-    department = request.session.get("sbranch")
-    data = models.Notes.objects.filter(department=department)
-    return render(request, "viewnotes.html", {"data": data})
-
-def uploadassign(request):
-    enroll = request.session["senroll"]
-    data = models.UploadAssignment.objects.filter(enroll=enroll)
-    if request.method=="GET":
-        return render(request, "uploadassign.html", {
-            "sname": request.session["sname"],
+        return redirect("/editTT/")
+    except Exception as e:
+        print(f"Error in manageTT: {e}")
+        return redirect("/editTT/")
+        
+def viewTT(request):
+    try:
+        department = request.session.get("sbranch")
+        sname = request.session.get("sname")
+        
+        if not department or not sname:
+            return redirect("/login/")
+            
+        data = models.TimeTable.objects.filter(department=department)
+        return render(request, "viewTT.html", {
+            "sname": sname,
             "data": data
         })
-    else :
-        name = request.session["sname"]
-        branch = request.session["sbranch"]
+    except Exception as e:
+        print(f"Error in viewTT: {e}")
+        return render(request, "error.html", {"message": "Error loading timetable."})
 
-        subject = request.POST.get("subject")
-
-        file = request.FILES["file"]
-        fs = FileSystemStorage()
-        filename = fs.save(file.name, file)
-
-        p = models.UploadAssignment(enroll=enroll, name=name, branch=branch, subject=subject, filename=filename, verify = 0 , info=time.asctime())
-        p.save()
-
-        data = models.UploadAssignment.objects.filter(enroll=enroll)
-        return render(request, "uploadassign.html", {"data": data})
+def addnotes(request):
+    try:
+        department = request.session.get("tdepartment")
+        tname = request.session.get("tname")
         
-def verifyassign(request) :
-    branch = request.session["tdepartment"]
-    data = models.UploadAssignment.objects.filter(branch=branch)
-    return render(request,"verifyassign.html",{"tname": request.session["tname"], "data":data})
+        if not department or not tname:
+            return redirect("/logintg/")
+            
+        if request.method == "GET":
+            data = models.Notes.objects.filter(department=department)
+            return render(request, "addnotes.html", {
+                "tname": tname,
+                "data": data
+            })
+        else:
+            department_post = request.POST.get("department")
+            subject = request.POST.get("subject")
+            title = request.POST.get("title")
+            
+            if not all([department_post, subject, title]):
+                data = models.Notes.objects.filter(department=department)
+                return render(request, "addnotes.html", {
+                    "tname": tname,
+                    "data": data,
+                    "error": "All fields are required!"
+                })
+
+            if "file" not in request.FILES:
+                data = models.Notes.objects.filter(department=department)
+                return render(request, "addnotes.html", {
+                    "tname": tname,
+                    "data": data,
+                    "error": "Please select a file!"
+                })
+
+            file = request.FILES['file']
+            fs = FileSystemStorage()
+            filename = fs.save(file.name, file)
+
+            p = models.Notes(
+                department=department_post,
+                subject=subject,
+                title=title,
+                filename=filename,
+                info=time.asctime()
+            )
+            p.save()
+            
+            data = models.Notes.objects.filter(department=department)
+            return render(request, "addnotes.html", {
+                "tname": tname,
+                "data": data,
+                "success": "Notes uploaded successfully!"
+            })
+    except Exception as e:
+        print(f"Error in addnotes: {e}")
+        return render(request, "error.html", {"message": "Error uploading notes."})
+    
+def managenotes(request):
+    try:
+        if not request.session.get("tname"):
+            return redirect("/logintg/")
+            
+        s = request.GET.get("s")
+        subject = request.GET.get("subject")
+        title = request.GET.get("title")
+        department = request.GET.get("department")
+        
+        if s == "delete" and all([subject, title, department]):
+            models.Notes.objects.filter(
+                subject=subject,
+                title=title,
+                department=department
+            ).delete()
+
+        return redirect("/addnotes/")
+    except Exception as e:
+        print(f"Error in managenotes: {e}")
+        return redirect("/addnotes/")
+
+def viewnotes(request):
+    try:
+        department = request.session.get("sbranch")
+        sname = request.session.get("sname")
+        
+        if not department:
+            return redirect("/login/")
+            
+        data = models.Notes.objects.filter(department=department)
+        return render(request, "viewnotes.html", {
+            "data": data,
+            "sname": sname
+        })
+    except Exception as e:
+        print(f"Error in viewnotes: {e}")
+        return render(request, "error.html", {"message": "Error loading notes."})
+
+def uploadassign(request):
+    try:
+        enroll = request.session.get("senroll")
+        sname = request.session.get("sname")
+        sbranch = request.session.get("sbranch")
+        
+        if not all([enroll, sname, sbranch]):
+            return redirect("/login/")
+            
+        data = models.UploadAssignment.objects.filter(enroll=enroll)
+        
+        if request.method == "GET":
+            return render(request, "uploadassign.html", {
+                "sname": sname,
+                "data": data
+            })
+        else:
+            subject = request.POST.get("subject")
+            
+            if not subject:
+                return render(request, "uploadassign.html", {
+                    "sname": sname,
+                    "data": data,
+                    "error": "Subject is required!"
+                })
+
+            if "file" not in request.FILES:
+                return render(request, "uploadassign.html", {
+                    "sname": sname,
+                    "data": data,
+                    "error": "Please select a file!"
+                })
+
+            file = request.FILES["file"]
+            fs = FileSystemStorage()
+            filename = fs.save(file.name, file)
+
+            p = models.UploadAssignment(
+                enroll=enroll,
+                name=sname,
+                branch=sbranch,
+                subject=subject,
+                filename=filename,
+                verify=0,
+                info=time.asctime()
+            )
+            p.save()
+
+            data = models.UploadAssignment.objects.filter(enroll=enroll)
+            return render(request, "uploadassign.html", {
+                "data": data,
+                "sname": sname,
+                "success": "Assignment uploaded successfully!"
+            })
+    except Exception as e:
+        print(f"Error in uploadassign: {e}")
+        return render(request, "error.html", {"message": "Error uploading assignment."})
+        
+def verifyassign(request):
+    try:
+        branch = request.session.get("tdepartment")
+        tname = request.session.get("tname")
+        
+        if not branch or not tname:
+            return redirect("/logintg/")
+            
+        data = models.UploadAssignment.objects.filter(branch=branch)
+        return render(request, "verifyassign.html", {
+            "tname": tname,
+            "data": data
+        })
+    except Exception as e:
+        print(f"Error in verifyassign: {e}")
+        return render(request, "error.html", {"message": "Error loading assignments."})
 
 def verify(request):
-    v = request.GET.get("v")
-    enroll = request.GET.get("enroll")
+    try:
+        if not request.session.get("tname"):
+            return redirect("/logintg/")
+            
+        v = request.GET.get("v")
+        enroll = request.GET.get("enroll")
+        
+        if v and enroll:
+            if v == "0":
+                models.UploadAssignment.objects.filter(enroll=enroll).update(verify=1)
+            else:
+                models.UploadAssignment.objects.filter(enroll=enroll).update(verify=0)
 
-    if v=="0" : 
-        models.UploadAssignment.objects.filter(enroll=enroll).update(verify=1)
-    else :
-        models.UploadAssignment.objects.filter(enroll=enroll).update(verify=0)
-
-    return redirect("/verifyassign/")
+        return redirect("/verifyassign/")
+    except Exception as e:
+        print(f"Error in verify: {e}")
+        return redirect("/verifyassign/")
 
 def attendance(request):
     try:
@@ -699,106 +958,151 @@ def view_attendance(request):
 
 
 def student_view_attendance(request):
-    enroll = request.session.get("senroll")  # get enrolled student ID
-    if not enroll:
-        return redirect('/login/')
-    
-    student = models.Register.objects.filter(enroll=enroll, role="student", status=1).first()
-    
-    if not student:
-        return render(request, "error.html", {"message": "Student not found or inactive."})
+    try:
+        enroll = request.session.get("senroll")
+        sname = request.session.get("sname")
+        
+        if not enroll:
+            return redirect('/login/')
+        
+        student = models.Register.objects.filter(enroll=enroll, role="student", status=1).first()
+        
+        if not student:
+            return render(request, "error.html", {"message": "Student not found or inactive."})
 
-    default_from_date = date(2025, 6, 1) 
-    default_to_date = date.today()
+        default_from_date = date(2025, 6, 1) 
+        default_to_date = date.today()
 
-    from_date = request.GET.get("from_date") or default_from_date.strftime("%Y-%m-%d")
-    to_date = request.GET.get("to_date") or default_to_date.strftime("%Y-%m-%d")
+        from_date = request.GET.get("from_date") or default_from_date.strftime("%Y-%m-%d")
+        to_date = request.GET.get("to_date") or default_to_date.strftime("%Y-%m-%d")
 
-    from_dt = datetime.strptime(from_date, "%Y-%m-%d").date()
-    to_dt = datetime.strptime(to_date, "%Y-%m-%d").date()
+        try:
+            from_dt = datetime.strptime(from_date, "%Y-%m-%d").date()
+            to_dt = datetime.strptime(to_date, "%Y-%m-%d").date()
+        except ValueError:
+            from_dt = default_from_date
+            to_dt = default_to_date
 
-    attendance_records = models.Attendance.objects.filter(
-        enroll=enroll,
-        date__range=(from_dt, to_dt)
-    ).order_by("date")
+        attendance_records = models.Attendance.objects.filter(
+            enroll=enroll,
+            date__range=(from_dt, to_dt)
+        ).order_by("date")
 
-    total_days = attendance_records.count()
-    present = attendance_records.filter(status="Present").count()
-    absent = attendance_records.filter(status="Absent").count()
-    leave = attendance_records.filter(status="Leave").count()
+        total_days = attendance_records.count()
+        present = attendance_records.filter(status="Present").count()
+        absent = attendance_records.filter(status="Absent").count()
+        leave = attendance_records.filter(status="Leave").count()
 
-    effective_days = total_days - leave
-    percentage = (present / effective_days * 100) if effective_days > 0 else 0
+        effective_days = total_days - leave
+        percentage = (present / effective_days * 100) if effective_days > 0 else 0
 
-
-    return render(request, "student_view_attendance.html", {
-        "student": student,
-        "records": attendance_records,
-        "from_date": from_date,
-        "to_date": to_date,
-        "total_days": total_days,
-        "present": present,
-        "absent": absent,
-        "leave": leave,
-        "percentage": round(percentage, 2),
-    })
+        return render(request, "student_view_attendance.html", {
+            "student": student,
+            "records": attendance_records,
+            "from_date": from_date,
+            "to_date": to_date,
+            "total_days": total_days,
+            "present": present,
+            "absent": absent,
+            "leave": leave,
+            "percentage": round(percentage, 2),
+            "sname": sname,
+        })
+    except Exception as e:
+        print(f"Error in student_view_attendance: {e}")
+        return render(request, "error.html", {"message": "Error loading attendance data."})
 
 def notify(request):
-    # List of departments
-    departments = ["CSE", "IT", "CSE-AI", "CSE-DS", "Mechanical", "Electrical", "Civil"]
+    try:
+        user_department = request.session.get("tdepartment")
+        tname = request.session.get("tname")
+        
+        if not user_department or not tname:
+            return redirect("/logintg/")
+            
+        departments = ["CSE", "IT", "CSE-AI", "CSE-DS", "Mechanical", "Electrical", "Civil"]
 
-    user_department = request.session.get("tdepartment")  # Teacher's dept from session
+        if request.method == "GET":
+            data = models.Notification.objects.filter(department=user_department)
+            return render(request, "notify.html", {
+                "tname": tname,
+                "departments": departments,
+                "data": data,
+                "user_department": user_department,
+            })
+        else:
+            title = request.POST.get("title")
+            department = request.POST.get("department")
+            expiry_date = request.POST.get("expiry_date")
+            
+            if not all([title, department, expiry_date]):
+                data = models.Notification.objects.filter(department=user_department)
+                return render(request, "notify.html", {
+                    "tname": tname,
+                    "departments": departments,
+                    "data": data,
+                    "user_department": user_department,
+                    "error": "All fields are required!"
+                })
 
-    if request.method == "GET":
-        # Filter notifications by tg's department only
-        data = models.Notification.objects.filter(department=user_department)
-        return render(request, "notify.html", {
-            "tname": request.session.get("tname"),
-            "departments": departments,
-            "data": data,
-            "user_department": user_department,
-        })
+            if "file" not in request.FILES:
+                data = models.Notification.objects.filter(department=user_department)
+                return render(request, "notify.html", {
+                    "tname": tname,
+                    "departments": departments,
+                    "data": data,
+                    "user_department": user_department,
+                    "error": "Please select a file!"
+                })
 
-    else:
-        title = request.POST.get("title")
-        department = request.POST.get("department")
-        expiry_date = request.POST.get("expiry_date")
-        file = request.FILES['file']
+            file = request.FILES['file']
+            fs = FileSystemStorage()
+            filename = fs.save(file.name, file)
 
-        # Save file
-        fs = FileSystemStorage()
-        filename = fs.save(file.name, file)
+            n = models.Notification(
+                department=department,
+                title=title,
+                notice_file=filename,
+                info=time.asctime(),
+                expiry_date=expiry_date
+            )
+            n.save()
 
-        # Save notification
-        n = models.Notification(
-            department=department,
-            title=title,
-            notice_file=filename,
-            info=time.asctime(),
-            expiry_date=expiry_date
-        )
-        n.save()
-
-        data = models.Notification.objects.filter(department=user_department)
-        return render(request, "notify.html", {
-            "tname": request.session.get("tname"),
-            "departments": departments,
-            "data": data,
-            "user_department": user_department,
-        })
+            data = models.Notification.objects.filter(department=user_department)
+            return render(request, "notify.html", {
+                "tname": tname,
+                "departments": departments,
+                "data": data,
+                "user_department": user_department,
+                "success": "Notification uploaded successfully!"
+            })
+    except Exception as e:
+        print(f"Error in notify: {e}")
+        return render(request, "error.html", {"message": "Error uploading notification."})
 
 def student_notifications(request):
-    user_department = request.session.get("sbranch") 
+    try:
+        user_department = request.session.get("sbranch")
+        sname = request.session.get("sname")
+        
+        if not user_department:
+            return redirect("/login/")
 
-    notifications = models.Notification.objects.filter(department=user_department).order_by('-expiry_date')
+        notifications = models.Notification.objects.filter(
+            department=user_department
+        ).order_by('-expiry_date')
 
-    today = date.today()
+        today = date.today()
 
-    return render(request, "student_notifications.html", {
-        "notifications": notifications,
-        "today": today,
-        "user_department": user_department,
-    })
+        return render(request, "student_notifications.html", {
+            "notifications": notifications,
+            "today": today,
+            "user_department": user_department,
+            "sname": sname,
+        })
+    except Exception as e:
+        print(f"Error in student_notifications: {e}")
+        return render(request, "error.html", {"message": "Error loading notifications."})
 
 def editprofile(request):
     email = request.session.get("semail")
