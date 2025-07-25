@@ -2,8 +2,10 @@ services:
   - type: web
     name: tgconnect
     env: python
-    buildCommand: "pip install -r requirements.txt"
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput"
     startCommand: "python manage.py migrate && gunicorn TGConnect.wsgi:application"
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: TGConnect.settings
+      - key: PYTHON_VERSION
+        value: 3.11.4

@@ -6,7 +6,7 @@ class Register(models.Model) :
     dob=models.DateField()
     gender = models.CharField(max_length=10)
     email=models.EmailField(unique=True)
-    mobile=models.IntegerField(unique=True)
+    mobile=models.CharField(max_length=15)  # Changed from IntegerField to CharField
     address = models.CharField(max_length=100)
     course = models.CharField(max_length=20)
     branch = models.CharField(max_length=20)
@@ -22,9 +22,9 @@ class RegisterTG(models.Model) :
     dob=models.DateField()
     gender = models.CharField(max_length=10)
     email=models.EmailField(unique=True)
-    mobile=models.IntegerField(unique=True)
+    mobile=models.CharField(max_length=15)  # Changed from IntegerField to CharField
     course = models.CharField(max_length=20)
-    department = models.CharField(max_length=20,unique=True)
+    department = models.CharField(max_length=20)  # Removed unique=True
     year = models.CharField(max_length=10)
     password = models.CharField(max_length=10)
     status = models.IntegerField(default=0)

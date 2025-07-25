@@ -42,7 +42,6 @@ urlpatterns = [
     path('uploadassign/',views.uploadassign),
     path('verifyassign/',views.verifyassign),
     path('verify/',views.verify),
-    path('attendance/', views.attendance),
     path('attendance/', views.attendance, name='attendance'),
     path('view_attendance/', views.view_attendance),
     path('student_view_attendance/', views.student_view_attendance),
