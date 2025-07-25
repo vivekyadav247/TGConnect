@@ -103,7 +103,7 @@ def verifyotp(request):
                         branch=data["branch"],
                         year=data["year"],
                         password=data["password"],
-                        status=1,  # status verified
+                        status=0,  # status verified
                         role="student",
                         info=time.asctime()
                     )
@@ -385,7 +385,7 @@ def verifytg(request):
                     department=temp_data["department"],
                     year=temp_data["year"],
                     password=temp_data["password"],
-                    status=1,
+                    status=0,
                     role="tg",
                     info=time.asctime()
                 )
@@ -647,7 +647,7 @@ def managestudent(request):
             return redirect("/logintg/")
         
         # Use dynamic department instead of hardcoded "CSE"
-        studentdet = models.Register.objects.filter(role="student", branch=tdepartment, status=1).order_by('name')
+        studentdet = models.Register.objects.filter(role="student", branch=tdepartment, status=0).order_by('name')
         
         return render(request, "managestudent.html", {
             "studentdet": studentdet,
