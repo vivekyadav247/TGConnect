@@ -318,15 +318,28 @@ def registertg(request):
             }
 
             # Send Email
-            send_mail(
-                "Verify Your Email for TG Registration",
-                f"Dear {name},\n\nWelcome to TGConnect! Your OTP for teacher registration is: {otp}\n\nPlease use this OTP to verify your account.\n\nThanks,\nTGConnect Team",
-                "vivekyad240706@gmail.com",
-                [email],
-                fail_silently=False
-            )
-
-            return render(request, "verifytg.html", {"email": email})
+            try:
+                send_mail(
+                    "Verify Your Email for TG Registration",
+                    f"Dear {name},\n\nWelcome to TGConnect! Your OTP for teacher registration is: {otp}\n\nPlease use this OTP to verify your account.\n\nThanks,\nTGConnect Team",
+                    "vivekyad240706@gmail.com",
+                    [email],
+                    fail_silently=False
+                )
+                print(f"Email sent successfully to {email} with OTP {otp}")
+                # If email sent successfully, redirect to verification page
+                return redirect("/verifytg/")
+            except Exception as email_error:
+                print(f"Email sending failed: {email_error}")
+                # Clear session data if email fails
+                if "temp_tg_data" in request.session:
+                    del request.session["temp_tg_data"]
+                return render(request, "registertg.html", {
+                    "error": "Failed to send verification email. Please check your email address and try again.",
+                    "id": id, "name": name, "dob": dob, "gender": gender,
+                    "email": email, "mobile": mobile, "course": course,
+                    "department": department, "year": year
+                })
         except Exception as e:
             print(f"Error in registertg: {e}")
             return render(request, "registertg.html", {
