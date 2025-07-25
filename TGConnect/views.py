@@ -561,95 +561,142 @@ def verify(request):
     return redirect("/verifyassign/")
 
 def attendance(request):
-    department = request.session.get("tdepartment")
-    tg_id = request.session.get("tid")
-    students = models.Register.objects.filter(branch=department, role="student", status=1).order_by('name')
+    try:
+        department = request.session.get("tdepartment")
+        tg_id = request.session.get("tid")
+        
+        # Check if TG is logged in
+        if not tg_id or not department:
+            return redirect("/logintg/")
+        
+        students = models.Register.objects.filter(branch=department, role="student", status=1).order_by('name')
 
-    today_date = datetime.now().date().strftime("%Y-%m-%d")
+        today_date = datetime.now().date().strftime("%Y-%m-%d")
 
-    if request.method == "POST":
-        attendance_date = request.POST.get("attendance_date")
-        try:
-            attendance_date_obj = datetime.strptime(attendance_date, "%Y-%m-%d").date()
-        except:
+        if request.method == "POST":
+            attendance_date = request.POST.get("attendance_date")
+            if not attendance_date:
+                return render(request, "attendance.html", {
+                    "students": students,
+                    "year": datetime.now().year,
+                    "today_date": today_date,
+                    "error": "Please select a valid date."
+                })
+            
+            try:
+                attendance_date_obj = datetime.strptime(attendance_date, "%Y-%m-%d").date()
+            except ValueError:
+                return render(request, "attendance.html", {
+                    "students": students,
+                    "year": datetime.now().year,
+                    "today_date": today_date,
+                    "error": "Invalid date format."
+                })
+
+            for student in students:
+                status = request.POST.get(f'attendance_{student.enroll}')
+                if status:
+                    # Delete existing attendance for this date
+                    models.Attendance.objects.filter(
+                        enroll=student.enroll, 
+                        date=attendance_date_obj, 
+                        tg_id=tg_id
+                    ).delete()
+                    
+                    # Create new attendance record
+                    models.Attendance.objects.create(
+                        enroll=student.enroll,
+                        name=student.name,
+                        branch=student.branch,
+                        date=attendance_date_obj,
+                        status=status,
+                        tg_id=tg_id
+                    )
+
             return redirect("/tghome/")
 
-        for student in students:
-            status = request.POST.get(f'attendance_{student.enroll}')
-            if status:
-                models.Attendance.objects.filter(enroll=student.enroll, date=attendance_date_obj, tg_id=tg_id).delete()
-                models.Attendance.objects.create(
-                    enroll=student.enroll,
-                    name=student.name,
-                    branch=student.branch,
-                    date=attendance_date_obj,
-                    status=status,
-                    tg_id=tg_id
-                )
-
-        return redirect("/tghome/")
-
-    return render(request, "attendance.html", {
-        "students": students,
-        "year": datetime.now().year,
-        "today_date": today_date,
-    })
+        return render(request, "attendance.html", {
+            "students": students,
+            "year": datetime.now().year,
+            "today_date": today_date,
+        })
+    
+    except Exception as e:
+        print(f"Error in attendance function: {e}")
+        return render(request, "error.html", {"message": "Error processing attendance. Please try again."})
 
 def view_attendance(request):
-    tgid = request.session.get("tid")
-    department = request.session.get("tdepartment")
-    students = models.Register.objects.filter(branch=department, role="student", status=1)
+    try:
+        tgid = request.session.get("tid")
+        department = request.session.get("tdepartment")
+        
+        # Check if TG is logged in
+        if not tgid or not department:
+            return redirect("/logintg/")
+        
+        students = models.Register.objects.filter(branch=department, role="student", status=1)
 
-    today_date = datetime.now().date()
-    from_date = request.GET.get("from_date") or "2025-06-01"
-    to_date = request.GET.get("to_date") or today_date.strftime("%Y-%m-%d")
+        today_date = datetime.now().date()
+        from_date = request.GET.get("from_date") or "2025-06-01"
+        to_date = request.GET.get("to_date") or today_date.strftime("%Y-%m-%d")
 
-    search = request.GET.get("search")
+        search = request.GET.get("search") or ""
 
-    from_dt = datetime.strptime(from_date, "%Y-%m-%d")
-    to_dt = datetime.strptime(to_date, "%Y-%m-%d")
+        try:
+            from_dt = datetime.strptime(from_date, "%Y-%m-%d").date()
+            to_dt = datetime.strptime(to_date, "%Y-%m-%d").date()
+        except ValueError:
+            # If date parsing fails, use default dates
+            from_dt = datetime.strptime("2025-06-01", "%Y-%m-%d").date()
+            to_dt = today_date
 
-    attendance_data = []
+        attendance_data = []
 
-    for student in students:
-        if search:
-            search = search.strip()
-            if search and search.lower() not in student.name.lower() and search not in student.enroll:
-                continue
+        for student in students:
+            if search:
+                search = search.strip()
+                if search and search.lower() not in student.name.lower() and search not in student.enroll:
+                    continue
 
-        records = models.Attendance.objects.filter(
-            enroll=student.enroll,
-            tg_id=tgid,
-            date__range=(from_dt, to_dt)
-        )
+            records = models.Attendance.objects.filter(
+                enroll=student.enroll,
+                tg_id=tgid,
+                date__range=(from_dt, to_dt)
+            )
 
-        total_days = records.count()
-        present = records.filter(status="Present").count()
-        absent = records.filter(status="Absent").count()
-        leave = records.filter(status="Leave").count()
-        effective_days = total_days - leave
-        percentage = (present / effective_days * 100) if effective_days > 0 else 0
+            total_days = records.count()
+            present = records.filter(status="Present").count()
+            absent = records.filter(status="Absent").count()
+            leave = records.filter(status="Leave").count()
+            effective_days = total_days - leave
+            percentage = (present / effective_days * 100) if effective_days > 0 else 0
 
-        attendance_data.append({
-            "enroll": student.enroll,
-            "name": student.name,
-            "branch": student.branch,
-            "total_days": total_days,
-            "present": present,
-            "absent": absent,
-            "leave": leave,
-            "percentage": round(percentage, 2)
+            attendance_data.append({
+                "enroll": student.enroll,
+                "name": student.name,
+                "branch": student.branch,
+                "total_days": total_days,
+                "present": present,
+                "absent": absent,
+                "leave": leave,
+                "percentage": round(percentage, 2)
+            })
+
+        attendance_data.sort(key=lambda x: x['name'].lower())
+
+        return render(request, "view_attendance.html", {
+            "attendance_data": attendance_data,
+            "from_date": from_date,
+            "to_date": to_date,
+            "search": search,
+            "today_date": today_date,
         })
+    
+    except Exception as e:
+        # Log the error and return a user-friendly error page
+        print(f"Error in view_attendance: {e}")
+        return render(request, "error.html", {"message": "Error loading attendance data. Please try again."})
 
-    attendance_data.sort(key=lambda x: x['name'].lower())
-
-    return render(request, "view_attendance.html", {
-        "attendance_data": attendance_data,
-        "from_date": from_date,
-        "to_date": to_date,
-        "search": search,
-        "today_date": today_date,
-    })
 
 def student_view_attendance(request):
     enroll = request.session.get("senroll")  # get enrolled student ID
