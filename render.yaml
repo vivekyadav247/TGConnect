@@ -3,7 +3,7 @@ services:
     name: tgconnect
     env: python
     buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput"
-    startCommand: "python manage.py migrate --fake TGConnect zero && python manage.py migrate && gunicorn TGConnect.wsgi:application"
+    startCommand: "python -c \"import django; django.setup(); from django.db import connection; cursor = connection.cursor(); cursor.execute('DROP TABLE IF EXISTS django_migrations CASCADE;')\" && python manage.py migrate && gunicorn TGConnect.wsgi:application"
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: TGConnect.settings
