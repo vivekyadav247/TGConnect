@@ -124,6 +124,15 @@
       <div class="overlay">
         <div class="login-container">
           <h2 class="text-center mb-4" style="color: #4b0082">Login Here</h2>
+          
+          <!-- Error Message Display -->
+          {% if error %}
+            <div class="alert alert-danger" role="alert">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              {{ error }}
+            </div>
+          {% endif %}
+          
           <form method="post" action="/logintg/">
             {% csrf_token %}
             <div class="mb-3">
@@ -133,6 +142,7 @@
                 class="form-control"
                 name="id"
                 placeholder="Enter your ID"
+                value="{{ request.POST.id|default:'' }}"
               />
             </div>
             <div class="mb-3">

@@ -50,7 +50,6 @@ urlpatterns = [
     path('editprofile/',views.editprofile),
     path('logout/', views.logout_student),
     path('logouttg/', views.logout_tg),
-    
 
 ]
 if settings.DEBUG:
