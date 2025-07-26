@@ -30,8 +30,3 @@ venv/
 .DS_Store
 Thumbs.db
 
-# Deployment scripts (not needed)
-deploy*.sh
-*.md
-!README.md
-reset_db.py

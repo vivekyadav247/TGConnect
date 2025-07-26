@@ -15,9 +15,6 @@ class Register(models.Model):
     status = models.IntegerField()
     role = models.CharField(max_length=10)
     info = models.CharField(max_length=50)
-    
-    class Meta:
-        db_table = 'TGConnect_register'
 
 
 class RegisterTG(models.Model):
@@ -34,9 +31,6 @@ class RegisterTG(models.Model):
     status = models.IntegerField(default=0)
     role = models.CharField(max_length=10)
     info = models.CharField(max_length=50)
-    
-    class Meta:
-        db_table = 'TGConnect_registertg'
 
 
 class addreports(models.Model):
@@ -47,9 +41,6 @@ class addreports(models.Model):
     cgpa = models.FloatField()
     filename = models.CharField(max_length=100)
     info = models.CharField(max_length=50)
-    
-    class Meta:
-        db_table = 'TGConnect_addreports'
 
 
 class TimeTable(models.Model):
@@ -60,9 +51,6 @@ class TimeTable(models.Model):
     todate = models.CharField(max_length=20)
     filename = models.CharField(max_length=20)
     info = models.CharField(max_length=50)
-    
-    class Meta:
-        db_table = 'TGConnect_timetable'
 
 
 class Notes(models.Model):
@@ -71,9 +59,6 @@ class Notes(models.Model):
     title = models.CharField(max_length=50, unique=True)
     filename = models.CharField(max_length=50)
     info = models.CharField(max_length=50)
-    
-    class Meta:
-        db_table = 'TGConnect_notes'
 
 
 class UploadAssignment(models.Model):
@@ -84,9 +69,6 @@ class UploadAssignment(models.Model):
     filename = models.CharField(max_length=40)
     verify = models.IntegerField()
     info = models.CharField(max_length=45)
-    
-    class Meta:
-        db_table = 'TGConnect_uploadassignment'
 
 
 class Attendance(models.Model):
@@ -96,9 +78,6 @@ class Attendance(models.Model):
     date = models.DateField()
     status = models.CharField(max_length=10)
     tg_id = models.CharField(max_length=20)
-    
-    class Meta:
-        db_table = 'TGConnect_attendance'
 
 
 class Notification(models.Model):
@@ -110,6 +89,3 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.title
-    
-    class Meta:
-        db_table = 'TGConnect_notification'
