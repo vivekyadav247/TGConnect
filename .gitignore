@@ -1,32 +1,6 @@
-# Environment variables
 .env
-
-# Database
 db.sqlite3
-
-# Python cache files
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-
-# Media files (user uploads)
 /media/
-
-# Static files
-/TGConnect/static/*
-!/TGConnect/static/TGConnect.jpeg
-staticfiles/
-
-# Virtual environment
-.venv/
-venv/
-
-# IDE files
-.vscode/
-.idea/
-
-# OS files
-.DS_Store
-Thumbs.db
-
+/TGConnect/static/
