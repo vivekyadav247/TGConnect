@@ -9,3 +9,8 @@ services:
         value: TGConnect.settings
       - key: PYTHON_VERSION
         value: 3.11.4
+
+databases:
+  - name: tgconnect-db
+    databaseName: tgconnect
+    user: tgconnect
