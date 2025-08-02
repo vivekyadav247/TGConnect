@@ -3,7 +3,7 @@
 > A modern, full-featured Django web application for educational institutions to manage students, teachers, academic records, and administrative tasks seamlessly.
 
 ## 🚀 Live Demo
-- **Application**: [Your Deployment URL]
+- **Application**: https://vivekyadav.pythonanywhere.com/
 - **Admin Panel**: `/admin/` (Django built-in admin)
 
 ## ✨ Key Features
@@ -234,7 +234,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support & Contact
 
 - **Developed by**: Glitchy ⚡
-- **Email**: vivekyad240706@gmail.com , sbhawsar2017@gmail.com , pushpydv.s02@gmail.com ,chouhansakshi068@gmail.com
+- **Email**: vivekyad240706@gmail.com , sbhawsar2017@gmail.com , pushpydv.s02@gmail.com , chouhansakshi068@gmail.com
 - **GitHub**: [@vivekyadav247](https://github.com/vivekyadav247)
 - **Repository**: [TGConnect](https://github.com/vivekyadav247/TGConnect)
 
