@@ -233,8 +233,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support & Contact
 
-- **Developed by**: Glitchy ⚡
-- **Email**: vivekyad240706@gmail.com , sbhawsar2017@gmail.com , pushpydv.s02@gmail.com , chouhansakshi068@gmail.com
+- **Developed by**: Vivek Yadav
+- **Email**: vivekyad240706@gmail.com 
 - **GitHub**: [@vivekyadav247](https://github.com/vivekyadav247)
 - **Repository**: [TGConnect](https://github.com/vivekyadav247/TGConnect)
 
